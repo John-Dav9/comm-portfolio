@@ -1,0 +1,155 @@
+.projects-hero {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 2.5rem;
+	align-items: center;
+	margin-bottom: 2.5rem;
+}
+
+.projects-hero h1 {
+	font-family: 'Fraunces', 'Times New Roman', serif;
+	font-size: clamp(2.1rem, 2.5vw + 1.3rem, 3rem);
+	margin: 0.6rem 0 1rem;
+}
+
+.hero-panel {
+	padding: 2rem;
+}
+
+.hero-panel ul {
+	margin: 0;
+	padding-left: 1.1rem;
+	color: var(--muted);
+	line-height: 1.6;
+}
+
+.projects-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	gap: 1.5rem;
+	margin-bottom: 2.5rem;
+}
+
+.project-card {
+	padding: 1.7rem;
+	display: grid;
+	gap: 1.1rem;
+}
+
+.project-card header p {
+	color: var(--muted);
+	line-height: 1.6;
+	margin: 0.4rem 0 0;
+}
+
+.project-card header .meta {
+	margin: 0.5rem 0 0.6rem;
+	font-weight: 600;
+	color: var(--ink);
+}
+
+.project-card h2 {
+	margin: 0.5rem 0 0.2rem;
+}
+
+.project-card h3 {
+	margin: 0 0 0.3rem;
+	font-size: 0.92rem;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--accent-2);
+}
+
+.project-card ul {
+	margin: 0;
+	padding-left: 1.1rem;
+	color: var(--muted);
+	line-height: 1.6;
+}
+
+.results {
+	color: var(--ink);
+	font-weight: 600;
+}
+
+.cta-card {
+	padding: 2rem;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1.5rem;
+}
+
+.media-spaces {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 1.4rem;
+	margin-top: 1.4rem;
+}
+
+.media-space {
+	padding: 1.5rem;
+	display: grid;
+	gap: 0.6rem;
+}
+
+.media-space p {
+	margin: 0;
+	color: var(--muted);
+}
+
+.media-space .hint {
+	font-size: 0.85rem;
+	color: var(--accent-2);
+	font-weight: 600;
+}
+
+.media-preview {
+	display: grid;
+	gap: 0.8rem;
+}
+
+.media-preview figure {
+	margin: 0;
+	display: grid;
+	gap: 0.4rem;
+}
+
+.media-preview img,
+.media-preview video {
+	width: 100%;
+	aspect-ratio: 16 / 9;
+	object-fit: cover;
+	border-radius: var(--radius-sm);
+	background: var(--surface-alt);
+}
+
+.media-preview figcaption {
+	color: var(--muted);
+	font-size: 0.9rem;
+}
+
+.media-list {
+	margin: 0;
+	padding-left: 1.1rem;
+	color: var(--muted);
+	line-height: 1.6;
+}
+
+.empty {
+	margin: 0;
+	color: var(--muted);
+	font-size: 0.95rem;
+}
+
+@media (max-width: 720px) {
+	.cta-card {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.projects-hero {
+		gap: 2rem;
+	}
+}

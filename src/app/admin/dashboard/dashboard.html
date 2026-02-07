@@ -1,0 +1,35 @@
+<section class="dashboard">
+	<header class="dashboard-header">
+		<div>
+			<p class="eyebrow">Tableau de bord</p>
+			<h1>Vue d’ensemble</h1>
+			<p class="lead">Suivez vos contenus, vos publications et vos demandes entrantes.</p>
+		</div>
+		<div class="actions">
+			@for (action of quickActions; track action.label) {
+				<a class="button" [routerLink]="action.link">{{ action.label }}</a>
+			}
+		</div>
+	</header>
+
+	<div class="stats-grid">
+		@for (stat of stats; track stat.label) {
+			<div class="stat-card">
+				<h2>{{ stat.value }}</h2>
+				<p>{{ stat.label }}</p>
+			</div>
+		}
+	</div>
+
+	<div class="updates-card">
+		<h2>Dernières mises à jour</h2>
+		<ul>
+			@for (update of latestUpdates; track update.title) {
+				<li>
+					<strong>{{ update.title }}</strong>
+					<span>{{ update.detail }}</span>
+				</li>
+			}
+		</ul>
+	</div>
+</section>

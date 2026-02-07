@@ -1,0 +1,124 @@
+<section class="admin-page">
+	<header class="admin-header">
+		<div>
+			<p class="eyebrow">Gestion articles</p>
+			<h1>Articles & ressources</h1>
+			<p class="lead">{{ publishedCount() }} articles publiés</p>
+		</div>
+	</header>
+
+	<div class="admin-grid">
+		<form class="admin-form" [formGroup]="articleForm" (ngSubmit)="addArticle()">
+			<h2>{{ editingId() ? 'Modifier l\'article' : 'Ajouter un article' }}</h2>
+			<div class="field">
+				<label for="title">Titre</label>
+				<input id="title" type="text" formControlName="title" />
+			</div>
+			<div class="field">
+				<label for="category">Catégorie</label>
+				<select id="category" formControlName="category">
+					@for (option of categoryOptions; track option.value) {
+						<option [value]="option.value">{{ option.label }}</option>
+					}
+				</select>
+			</div>
+			<div class="field-row">
+				<div class="field">
+					<label for="readTime">Temps de lecture</label>
+					<input id="readTime" type="text" formControlName="readTime" placeholder="5 min" />
+				</div>
+				<div class="field">
+					<label for="status">Statut</label>
+					<select id="status" formControlName="status">
+						@for (option of statusOptions; track option.value) {
+							<option [value]="option.value">{{ option.label }}</option>
+						}
+					</select>
+				</div>
+			</div>
+			<div class="field">
+				<label for="summary">Résumé</label>
+				<textarea id="summary" rows="4" formControlName="summary"></textarea>
+			</div>
+			<div class="button-group">
+				<button class="button primary" type="submit">
+					{{ editingId() ? 'Enregistrer les modifications' : 'Ajouter' }}
+				</button>
+				@if (editingId()) {
+					<button class="button ghost" type="button" (click)="cancelEdit()">
+						Annuler
+					</button>
+				}
+			</div>
+		</form>
+
+		<div class="list-panel">
+			<h2>Articles enregistrés</h2>
+			<ul>
+				@for (article of articles(); track article.id) {
+					<li [class.is-editing]="editingId() === article.id">
+						<div class="article-info">
+							<h3>{{ article.title }}</h3>
+							<p class="meta">{{ article.category }} · {{ article.readTime }}</p>
+							<p class="summary">{{ article.summary }}</p>
+							<span class="status" [class.is-published]="article.status === 'published'">
+								{{ article.status === 'published' ? 'Publié' : 'Brouillon' }}
+							</span>
+						</div>
+						<div class="article-actions">
+							<button class="button ghost" type="button" (click)="togglePublish(article.id)">
+								{{ article.status === 'published' ? 'Dépublier' : 'Publier' }}
+							</button>
+							<button class="button ghost" type="button" (click)="showPreview.set(article.id)">
+								Aperçu
+							</button>
+							<button class="button ghost" type="button" (click)="editArticle(article)">
+								Modifier
+							</button>
+							<button class="button ghost danger" type="button" (click)="removeArticle(article.id)">
+								Supprimer
+							</button>
+						</div>
+					</li>
+				}
+			</ul>
+		</div>
+	</div>
+
+	<!-- Preview Modal -->
+	@if (showPreview()) {
+		<div
+			class="modal-overlay"
+			tabindex="0"
+			role="presentation"
+			(click)="showPreview.set(null)"
+			(keydown.escape)="showPreview.set(null)">
+			<div
+				class="modal-content"
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby="article-preview-title"
+				aria-describedby="article-preview-body"
+				(click)="$event.stopPropagation()">
+				@if (getArticleToPreview(showPreview()!)) {
+					<div class="preview-header">
+						<h2 id="article-preview-title">
+							Aperçu: {{ getArticleToPreview(showPreview()!)?.title }}
+						</h2>
+						<button class="close-button" type="button" (click)="showPreview.set(null)">×</button>
+					</div>
+					<div id="article-preview-body" class="preview-body">
+						<p class="meta">{{ getArticleToPreview(showPreview()!)?.category }} · {{ getArticleToPreview(showPreview()!)?.readTime }}</p>
+						<p>{{ getArticleToPreview(showPreview()!)?.summary }}</p>
+						<div class="preview-status">
+							<strong>Statut:</strong>
+							<span class="status" [class.is-published]="getArticleToPreview(showPreview()!)?.status === 'published'">
+								{{ getArticleToPreview(showPreview()!)?.status === 'published' ? 'Publié' : 'Brouillon' }}
+							</span>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+	}
+</section>

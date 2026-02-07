@@ -1,0 +1,86 @@
+<section class="contact-hero">
+	<div>
+		<p class="eyebrow">{{ content().hero.eyebrow }}</p>
+		<h1>{{ content().hero.title }}</h1>
+		<p class="lead">{{ content().hero.lead }}</p>
+		<div class="contact-cards">
+			@for (card of content().cards; track card.title) {
+				<div class="contact-card">
+					<h2>{{ card.title }}</h2>
+					@for (line of card.lines; track line) {
+						<p>{{ line }}</p>
+					}
+				</div>
+			}
+		</div>
+	</div>
+
+	<form class="contact-form" [formGroup]="contactForm" (ngSubmit)="submitForm()">
+		<div class="field">
+			<label for="fullName">{{ content().form.fullName }}</label>
+			<input id="fullName" type="text" formControlName="fullName" autocomplete="name"
+				[attr.aria-describedby]="showError('fullName') ? 'fullName-error' : null" />
+			@if (showError('fullName')) {
+				<p id="fullName-error" class="error">{{ content().errors.fullName }}</p>
+			}
+		</div>
+
+		<div class="field">
+			<label for="email">{{ content().form.email }}</label>
+			<input id="email" type="email" formControlName="email" autocomplete="email"
+				[attr.aria-describedby]="showError('email') ? 'email-error' : null" />
+			@if (showError('email')) {
+				<p id="email-error" class="error">{{ content().errors.email }}</p>
+			}
+		</div>
+
+		<div class="field">
+			<label for="phone">{{ content().form.phone }}</label>
+			<input id="phone" type="tel" formControlName="phone" autocomplete="tel" />
+		</div>
+
+		<div class="field">
+			<label for="profile">{{ content().form.profile }}</label>
+			<select id="profile" formControlName="profile">
+				@for (option of profileOptions(); track option.value) {
+					<option [value]="option.value">{{ option.label }}</option>
+				}
+			</select>
+		</div>
+
+		<div class="field">
+			<label for="projectType">{{ content().form.projectType }}</label>
+			<select id="projectType" formControlName="projectType">
+				@for (option of projectOptions(); track option.value) {
+					<option [value]="option.value">{{ option.label }}</option>
+				}
+			</select>
+		</div>
+
+		<div class="field">
+			<label for="message">{{ content().form.message }}</label>
+			<textarea id="message" rows="5" formControlName="message"
+				[attr.aria-describedby]="showError('message') ? 'message-error' : null"></textarea>
+			@if (showError('message')) {
+				<p id="message-error" class="error">{{ content().errors.message }}</p>
+			}
+		</div>
+
+		<div class="field checkbox">
+			<label>
+				<input type="checkbox" formControlName="consent"
+					[attr.aria-describedby]="showError('consent') ? 'consent-error' : null" />
+				{{ content().form.consent }}
+			</label>
+			@if (showError('consent')) {
+				<p id="consent-error" class="error">{{ content().errors.consent }}</p>
+			}
+		</div>
+
+		<button class="button primary" type="submit">{{ content().form.submit }}</button>
+
+		@if (submitted() && contactForm.valid) {
+			<p class="success" role="status">{{ content().form.success }}</p>
+		}
+	</form>
+</section>

@@ -1,0 +1,87 @@
+<section class="blog-hero">
+	<div>
+		<p class="eyebrow">{{ content().hero.eyebrow }}</p>
+		<h1>{{ content().hero.title }}</h1>
+		<p class="lead">{{ content().hero.lead }}</p>
+	</div>
+	<div class="hero-panel card">
+		<h2>{{ content().hero.listTitle }}</h2>
+		<ul>
+			@for (item of content().hero.list; track item) {
+				<li>{{ item }}</li>
+			}
+		</ul>
+	</div>
+</section>
+
+<section class="articles-grid">
+	@for (article of articles(); track article.title) {
+		<article class="article-card card">
+			<header>
+				<span class="pill">{{ article.category }}</span>
+				<h2>{{ article.title }}</h2>
+				<p class="meta">{{ article.author }} · {{ article.date }}</p>
+				<p>{{ article.summary }}</p>
+			</header>
+			<div class="meta-row">
+				<span class="read-time">{{ article.readTime }}</span>
+				<div class="tags">
+					@for (tag of article.tags; track tag) {
+						<span class="tag">{{ tag }}</span>
+					}
+				</div>
+			</div>
+		</article>
+	}
+</section>
+
+<section class="resources section">
+	<p class="eyebrow">{{ content().resources.eyebrow }}</p>
+	<h2 class="section-title">{{ content().resources.title }}</h2>
+	<div class="resources-grid">
+		<div class="resource-card card">
+			<h3>{{ content().resources.pdfTitle }}</h3>
+			@if (pdfResources().length === 0) {
+				<p class="empty">{{ content().resources.emptyPdf }}</p>
+			} @else {
+				<ul class="resource-list">
+					@for (item of pdfResources(); track item.id) {
+						<li>
+							<a [href]="item.url" target="_blank" rel="noopener noreferrer">
+								{{ item.title }}
+							</a>
+						</li>
+					}
+				</ul>
+			}
+			<p class="hint">{{ content().resources.hint }}</p>
+		</div>
+		<div class="resource-card card">
+			<h3>{{ content().resources.audioTitle }}</h3>
+			@if (audioResources().length === 0) {
+				<p class="empty">{{ content().resources.emptyAudio }}</p>
+			} @else {
+				<div class="resource-audio">
+					@for (item of audioResources(); track item.id) {
+						<figure>
+							<audio [src]="item.url" controls></audio>
+							<figcaption>{{ item.title }}</figcaption>
+						</figure>
+					}
+				</div>
+			}
+			<p class="hint">{{ content().resources.hint }}</p>
+		</div>
+	</div>
+</section>
+
+<section class="cta section">
+	<div class="cta-card card">
+		<div>
+			<p class="eyebrow">{{ content().cta.eyebrow }}</p>
+			<h2 class="section-title">{{ content().cta.title }}</h2>
+			<p class="lead">{{ content().cta.lead }}</p>
+		</div>
+		<a class="button primary" routerLink="/contact">{{ content().cta.button }}</a>
+	</div>
+</section>

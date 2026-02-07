@@ -1,0 +1,201 @@
+<section class="home-hero">
+	<div class="hero-copy">
+		<p class="eyebrow">{{ content().hero.eyebrow }}</p>
+		<h1>{{ content().hero.title }}</h1>
+		<p class="lead">{{ content().hero.lead }}</p>
+		<div class="hero-actions">
+			<a class="button primary" routerLink="/contact">{{ content().hero.actions.primary }}</a>
+			<a class="button ghost" href="#expertises">{{ content().hero.actions.secondary }}</a>
+		</div>
+		<div class="hero-tags">
+			@for (tag of content().hero.tags; track tag) {
+				<span class="tag">{{ tag }}</span>
+			}
+		</div>
+	</div>
+
+	<div class="hero-panel card">
+		<p class="pill">{{ content().panel.pill }}</p>
+		<h2>{{ content().panel.title }}</h2>
+		<ul>
+			@for (item of content().panel.list; track item) {
+				<li>{{ item }}</li>
+			}
+		</ul>
+		<div class="hero-micro">
+			@for (item of content().panel.micro; track item.value) {
+				<div>
+					<strong>{{ item.value }}</strong>
+					<span>{{ item.label }}</span>
+				</div>
+			}
+		</div>
+	</div>
+</section>
+
+<section class="home-proof section">
+	<div class="proof-grid">
+		@for (card of content().proof.cards; track card.title) {
+			<div class="proof-card card">
+				<p class="pill">{{ card.pill }}</p>
+				<h3>{{ card.title }}</h3>
+				<p>{{ card.text }}</p>
+			</div>
+		}
+	</div>
+</section>
+
+<section id="expertises" class="home-services section">
+	<header class="section-head">
+		<p class="eyebrow">{{ content().services.eyebrow }}</p>
+		<h2 class="section-title">{{ content().services.title }}</h2>
+		<p class="lead">{{ content().services.lead }}</p>
+	</header>
+
+	<div class="service-grid">
+		@for (card of content().services.cards; track card.title) {
+			<article class="service-card card">
+				<h3>{{ card.title }}</h3>
+				<p>{{ card.text }}</p>
+				<ul>
+					@for (item of card.items; track item) {
+						<li>{{ item }}</li>
+					}
+				</ul>
+			</article>
+		}
+	</div>
+</section>
+
+<section class="home-process section">
+	<div class="process-panel card">
+		<p class="eyebrow">{{ content().process.eyebrow }}</p>
+		<h2 class="section-title">{{ content().process.title }}</h2>
+		<div class="process-grid">
+			@for (step of content().process.steps; track step.number) {
+				<div>
+					<span class="step-number">{{ step.number }}</span>
+					<h3>{{ step.title }}</h3>
+					<p>{{ step.text }}</p>
+				</div>
+			}
+		</div>
+	</div>
+</section>
+
+<section class="home-showcase section">
+	<header class="section-head">
+		<p class="eyebrow">{{ content().showcase.eyebrow }}</p>
+		<h2 class="section-title">{{ content().showcase.title }}</h2>
+	</header>
+	<div class="showcase-grid">
+		@for (card of content().showcase.cards; track card.title) {
+			<article class="showcase-card card">
+				<p class="pill">{{ card.pill }}</p>
+				<h3>{{ card.title }}</h3>
+				<p>{{ card.text }}</p>
+				<span class="meta">{{ card.meta }}</span>
+			</article>
+		}
+	</div>
+</section>
+
+<section class="home-media section">
+	<header class="section-head">
+		<p class="eyebrow">{{ content().media.eyebrow }}</p>
+		<h2 class="section-title">{{ content().media.title }}</h2>
+		<p class="lead">{{ content().media.lead }}</p>
+	</header>
+
+	<div class="media-grid">
+		<div class="media-card card">
+			<h3>{{ content().media.photos }}</h3>
+			@if (pressPhotos().length === 0) {
+				<p class="empty">{{ content().media.emptyPhotos }}</p>
+			} @else {
+				<div class="media-preview">
+					@for (item of pressPhotos(); track item.id) {
+						<figure class="media-figure">
+							<img [src]="item.url" [alt]="item.title" />
+							<figcaption>{{ item.title }}</figcaption>
+						</figure>
+					}
+				</div>
+			}
+		</div>
+		<div class="media-card card">
+			<h3>{{ content().media.videos }}</h3>
+			@if (showreelVideos().length === 0) {
+				<p class="empty">{{ content().media.emptyVideos }}</p>
+			} @else {
+				<div class="media-preview">
+					@for (item of showreelVideos(); track item.id) {
+						<figure class="media-figure">
+							<video [src]="item.url" controls></video>
+							<figcaption>{{ item.title }}</figcaption>
+						</figure>
+					}
+				</div>
+			}
+		</div>
+		<div class="media-card card">
+			<h3>{{ content().media.docs }}</h3>
+			@if (pressDocuments().length === 0) {
+				<p class="empty">{{ content().media.emptyDocs }}</p>
+			} @else {
+				<ul class="media-list">
+					@for (item of pressDocuments(); track item.id) {
+						<li>
+							<a [href]="item.url" target="_blank" rel="noopener noreferrer">
+								{{ item.title }}
+							</a>
+						</li>
+					}
+				</ul>
+			}
+		</div>
+		<div class="media-card card">
+			<h3>{{ content().media.audio }}</h3>
+			@if (audioClips().length === 0) {
+				<p class="empty">{{ content().media.emptyAudio }}</p>
+			} @else {
+				<div class="media-preview">
+					@for (item of audioClips(); track item.id) {
+						<figure class="media-figure">
+							<audio [src]="item.url" controls></audio>
+							<figcaption>{{ item.title }}</figcaption>
+						</figure>
+					}
+				</div>
+			}
+		</div>
+	</div>
+</section>
+
+<section class="home-testimonials section">
+	<div class="testimonial-panel card">
+		<div>
+			<p class="eyebrow">{{ content().testimonials.eyebrow }}</p>
+			<h2 class="section-title">{{ content().testimonials.title }}</h2>
+		</div>
+		<div class="testimonial-grid">
+			@for (item of content().testimonials.items; track item.author) {
+				<blockquote>
+					<p>{{ item.text }}</p>
+					<footer>— {{ item.author }}</footer>
+				</blockquote>
+			}
+		</div>
+	</div>
+</section>
+
+<section class="home-cta section">
+	<div class="cta-panel card">
+		<div>
+			<p class="eyebrow">{{ content().cta.eyebrow }}</p>
+			<h2 class="section-title">{{ content().cta.title }}</h2>
+			<p class="lead">{{ content().cta.lead }}</p>
+		</div>
+		<a class="button primary" routerLink="/contact">{{ content().cta.button }}</a>
+	</div>
+</section>

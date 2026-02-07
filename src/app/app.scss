@@ -1,0 +1,280 @@
+.skip-link {
+	position: absolute;
+	left: -999px;
+	top: 0.75rem;
+	padding: 0.6rem 1rem;
+	background: #000;
+	color: #fff;
+	border-radius: 999px;
+	z-index: 10;
+}
+
+.skip-link:focus {
+	left: 1rem;
+}
+
+:host {
+	display: block;
+	min-height: 100vh;
+}
+
+.app-shell {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+}
+
+.site-header {
+	position: sticky;
+	top: 0;
+	z-index: 10;
+	background: rgba(255, 255, 255, 0.92);
+	backdrop-filter: blur(12px);
+	border-bottom: 1px solid rgba(20, 22, 31, 0.08);
+}
+
+.header-content {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 2rem;
+	padding: 1.1rem 0;
+	flex-wrap: wrap;
+}
+
+.brand {
+	flex: 1 1 auto;
+	min-width: 0;
+}
+
+.brand {
+	display: grid;
+	gap: 0.2rem;
+}
+
+.brand-title {
+	font-family: 'Fraunces', 'Times New Roman', serif;
+	font-size: 1.25rem;
+	margin: 0;
+}
+
+.brand-subtitle {
+	margin: 0;
+	color: var(--muted);
+	font-size: 0.85rem;
+	max-width: 32ch;
+	line-height: 1.4;
+}
+
+.site-nav {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	align-items: center;
+}
+
+.site-nav a {
+	padding: 0.5rem 0.9rem;
+	border-radius: 999px;
+	color: var(--ink-soft);
+	font-weight: 600;
+}
+
+.site-nav a.active {
+	background: rgba(42, 157, 143, 0.12);
+	color: var(--accent-2);
+}
+
+.nav-cta {
+	background: var(--ink);
+	color: #fff !important;
+	box-shadow: var(--shadow-sm);
+}
+
+.lang-switch {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.4rem;
+	border: 1px solid rgba(20, 22, 31, 0.12);
+	border-radius: 999px;
+	padding: 0.25rem;
+	background: #fff;
+}
+
+.lang-btn {
+	border: none;
+	background: transparent;
+	padding: 0.35rem 0.7rem;
+	border-radius: 999px;
+	font-weight: 600;
+	cursor: pointer;
+	color: var(--ink-soft);
+}
+
+.lang-btn.is-active {
+	background: rgba(42, 157, 143, 0.18);
+	color: var(--accent-2);
+}
+
+.nav-lang {
+	display: none;
+	align-items: center;
+	gap: 0.4rem;
+	padding: 0.25rem;
+	border-radius: 999px;
+	border: 1px solid rgba(20, 22, 31, 0.12);
+	background: #fff;
+	justify-content: center;
+}
+
+.nav-toggle {
+	display: none;
+	align-items: center;
+	justify-content: center;
+	gap: 0.3rem;
+	width: 44px;
+	height: 44px;
+	border-radius: 12px;
+	border: 1px solid rgba(20, 22, 31, 0.12);
+	background: #fff;
+	cursor: pointer;
+}
+
+.nav-toggle .bar {
+	display: block;
+	width: 18px;
+	height: 2px;
+	background: var(--ink);
+	border-radius: 999px;
+}
+
+.sr-only {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+.site-main {
+	flex: 1;
+	padding: 2.5rem 0 4rem;
+	padding-inline: 2.5rem;
+}
+
+.site-footer {
+	background: var(--surface);
+	border-top: 1px solid var(--border);
+}
+
+.footer-content {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	justify-content: space-between;
+	padding: 2rem 0;
+	color: var(--muted);
+	font-size: 0.92rem;
+}
+
+.footer-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.6rem;
+	align-items: center;
+}
+
+@media (max-width: 900px) {
+	.header-content {
+		flex-direction: row;
+		align-items: center;
+		flex-wrap: wrap;
+	}
+
+	.site-nav {
+		width: 100%;
+		justify-content: flex-start;
+	}
+}
+
+@media (max-width: 600px) {
+	.site-main {
+		padding: 2rem 0 3rem;
+		padding-inline: 1.5rem;
+	}
+
+	.nav-toggle {
+		display: inline-flex;
+		flex: 0 0 auto;
+		margin-left: 0;
+	}
+
+	.header-content {
+		display: grid;
+		grid-template-columns: 1fr auto;
+		gap: 0.75rem 0.6rem;
+		align-items: center;
+	}
+
+	.brand {
+		grid-column: 1 / 2;
+	}
+
+	.nav-toggle {
+		grid-column: 2 / 3;
+		justify-self: end;
+	}
+
+	.site-nav {
+		grid-column: 1 / -1;
+	}
+
+	.nav-lang {
+		display: inline-flex;
+		width: 100%;
+	}
+
+	.lang-switch {
+		display: none;
+	}
+
+	.site-nav {
+		width: 100%;
+		flex-direction: column;
+		align-items: stretch;
+		gap: 0.5rem;
+		max-height: 0;
+		overflow: hidden;
+		opacity: 0;
+		pointer-events: none;
+		transition: max-height 0.25s ease, opacity 0.2s ease;
+	}
+
+	.site-nav.is-open {
+		max-height: 400px;
+		opacity: 1;
+		pointer-events: auto;
+		margin-top: 0.75rem;
+	}
+
+	.site-nav a {
+		width: 100%;
+		text-align: center;
+		padding: 0.65rem 0.9rem;
+	}
+
+	.brand-subtitle {
+		max-width: 100%;
+		font-size: 0.78rem;
+		line-height: 1.3;
+	}
+
+	.header-content {
+		padding-inline: 1.5rem;
+		justify-content: flex-start;
+	}
+}

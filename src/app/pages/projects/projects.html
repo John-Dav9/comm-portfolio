@@ -1,0 +1,112 @@
+<section class="projects-hero">
+	<div>
+		<p class="eyebrow">{{ content().hero.eyebrow }}</p>
+		<h1>{{ content().hero.title }}</h1>
+		<p class="lead">{{ content().hero.lead }}</p>
+	</div>
+	<div class="hero-panel card">
+		<h2>{{ content().hero.panelTitle }}</h2>
+		<ul>
+			@for (item of content().hero.bullets; track item) {
+				<li>{{ item }}</li>
+			}
+		</ul>
+	</div>
+</section>
+
+<section class="projects-grid">
+	@for (caseStudy of caseStudies(); track caseStudy.title) {
+		<article class="project-card card">
+			<header>
+				<span class="pill">{{ caseStudy.category }}</span>
+				<h2>{{ caseStudy.title }}</h2>
+				<p class="meta">{{ caseStudy.client }} · {{ caseStudy.year }}</p>
+				<p>{{ caseStudy.context }}</p>
+			</header>
+			<div>
+				<h3>Mission</h3>
+				<p>{{ caseStudy.mission }}</p>
+			</div>
+			<div>
+				<h3>Livrables</h3>
+				<ul>
+					@for (item of caseStudy.deliverables; track item) {
+						<li>{{ item }}</li>
+					}
+				</ul>
+			</div>
+			<div>
+				<h3>Résultats</h3>
+				<ul class="results">
+					@for (item of caseStudy.results; track item) {
+						<li>{{ item }}</li>
+					}
+				</ul>
+			</div>
+		</article>
+	}
+</section>
+
+<section class="project-media section">
+	<p class="eyebrow">{{ content().media.eyebrow }}</p>
+	<h2 class="section-title">{{ content().media.title }}</h2>
+	<div class="media-spaces">
+		<div class="media-space card">
+			<h3>Photos professionnelles</h3>
+			@if (projectPhotos().length === 0) {
+				<p class="empty">{{ content().media.emptyPhoto }}</p>
+			} @else {
+				<div class="media-preview">
+					@for (item of projectPhotos(); track item.id) {
+						<figure>
+							<img [src]="item.url" [alt]="item.title" />
+							<figcaption>{{ item.title }}</figcaption>
+						</figure>
+					}
+				</div>
+			}
+		</div>
+		<div class="media-space card">
+			<h3>Vidéos & showreels</h3>
+			@if (projectVideos().length === 0) {
+				<p class="empty">{{ content().media.emptyVideo }}</p>
+			} @else {
+				<div class="media-preview">
+					@for (item of projectVideos(); track item.id) {
+						<figure>
+							<video [src]="item.url" controls></video>
+							<figcaption>{{ item.title }}</figcaption>
+						</figure>
+					}
+				</div>
+			}
+		</div>
+		<div class="media-space card">
+			<h3>Documents PDF</h3>
+			@if (projectDocuments().length === 0) {
+				<p class="empty">{{ content().media.emptyDoc }}</p>
+			} @else {
+				<ul class="media-list">
+					@for (item of projectDocuments(); track item.id) {
+						<li>
+							<a [href]="item.url" target="_blank" rel="noopener noreferrer">
+								{{ item.title }}
+							</a>
+						</li>
+					}
+				</ul>
+			}
+		</div>
+	</div>
+</section>
+
+<section class="cta section">
+	<div class="cta-card card">
+		<div>
+			<p class="eyebrow">{{ content().cta.eyebrow }}</p>
+			<h2 class="section-title">{{ content().cta.title }}</h2>
+			<p class="lead">{{ content().cta.lead }}</p>
+		</div>
+		<a class="button primary" routerLink="/contact">{{ content().cta.button }}</a>
+	</div>
+</section>

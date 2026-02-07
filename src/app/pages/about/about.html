@@ -1,0 +1,149 @@
+<section class="about-hero">
+	<div>
+		<p class="eyebrow">{{ content().hero.eyebrow }}</p>
+		<h1>{{ content().hero.title }}</h1>
+		<p class="lead">{{ content().hero.lead }}</p>
+		<div class="about-metrics">
+			@for (item of content().hero.metrics; track item.value) {
+				<div>
+					<strong>{{ item.value }}</strong>
+					<span>{{ item.label }}</span>
+				</div>
+			}
+		</div>
+	</div>
+	<div class="about-card card">
+		<h2>{{ content().hero.cardTitle }}</h2>
+		<ul>
+			@for (item of content().hero.cardList; track item) {
+				<li>{{ item }}</li>
+			}
+		</ul>
+	</div>
+</section>
+
+<section class="values section">
+	<p class="eyebrow">{{ content().values.eyebrow }}</p>
+	<h2 class="section-title">{{ content().values.title }}</h2>
+	<div class="value-grid">
+		@for (value of content().values.items; track value.title) {
+			<article class="value-card card">
+				<h3>{{ value.title }}</h3>
+				<p>{{ value.description }}</p>
+			</article>
+		}
+	</div>
+</section>
+
+<section class="timeline section">
+	<p class="eyebrow">{{ content().timeline.eyebrow }}</p>
+	<h2 class="section-title">{{ content().timeline.title }}</h2>
+	<div class="timeline-grid">
+		@for (step of content().timeline.items; track step.title) {
+			<div class="timeline-item card">
+				<h3>{{ step.title }}</h3>
+				<p>{{ step.detail }}</p>
+			</div>
+		}
+	</div>
+</section>
+
+<section class="highlights section">
+	<div class="highlight-card card">
+		<h2 class="section-title">{{ content().highlights.title }}</h2>
+		<div class="highlight-list">
+			@for (item of content().highlights.items; track item.title) {
+				<div>
+					<h3>{{ item.title }}</h3>
+					<p>{{ item.detail }}</p>
+				</div>
+			}
+		</div>
+	</div>
+</section>
+
+<section class="partners section">
+	<p class="eyebrow">{{ content().partners.eyebrow }}</p>
+	<h2 class="section-title">{{ content().partners.title }}</h2>
+	<div class="partner-list">
+		@for (partner of content().partners.items; track partner) {
+			<span class="partner-pill">{{ partner }}</span>
+		}
+	</div>
+</section>
+
+<section class="partner-media section">
+	<p class="eyebrow">{{ content().partnerMedia.eyebrow }}</p>
+	<h2 class="section-title">{{ content().partnerMedia.title }}</h2>
+	@if (partnerMedia().length === 0) {
+		<p class="lead">{{ content().partnerMedia.empty }}</p>
+	} @else {
+		<div class="partner-media-grid">
+			@for (item of partnerMedia(); track item.id) {
+				<figure class="partner-media-card card">
+					<img [src]="item.url" [alt]="item.title" />
+					<figcaption>{{ item.title }}</figcaption>
+				</figure>
+			}
+		</div>
+	}
+</section>
+
+<section class="publication-media section">
+	<p class="eyebrow">{{ content().publications.eyebrow }}</p>
+	<h2 class="section-title">{{ content().publications.title }}</h2>
+	@if (publicationsPdf().length === 0) {
+		<p class="lead">{{ content().publications.empty }}</p>
+	} @else {
+		<ul class="publication-list">
+			@for (item of publicationsPdf(); track item.id) {
+				<li>
+					<a [href]="item.url" target="_blank" rel="noopener noreferrer">
+						{{ item.title }}
+					</a>
+				</li>
+			}
+		</ul>
+	}
+</section>
+
+<section class="showreel-media section">
+	<p class="eyebrow">{{ content().showreel.eyebrow }}</p>
+	<h2 class="section-title">{{ content().showreel.title }}</h2>
+	@if (showreelVideos().length === 0) {
+		<p class="lead">{{ content().showreel.empty }}</p>
+	} @else {
+		<div class="showreel-grid">
+			@for (item of showreelVideos(); track item.id) {
+				<figure class="showreel-card card">
+					<video [src]="item.url" controls></video>
+					<figcaption>{{ item.title }}</figcaption>
+				</figure>
+			}
+		</div>
+	}
+</section>
+
+<section class="press-kit section">
+	<p class="eyebrow">{{ content().pressKit.eyebrow }}</p>
+	<h2 class="section-title">{{ content().pressKit.title }}</h2>
+	<div class="press-grid">
+		@for (item of content().pressKit.items; track item.title) {
+			<div class="press-card card">
+				<h3>{{ item.title }}</h3>
+				<p>{{ item.description }}</p>
+			</div>
+		}
+	</div>
+</section>
+
+<section class="cta section">
+	<div class="cta-card card">
+		<div>
+			<p class="eyebrow">{{ content().cta.eyebrow }}</p>
+			<h2 class="section-title">{{ content().cta.title }}</h2>
+			<p class="lead">{{ content().cta.lead }}</p>
+		</div>
+		<a class="button primary" routerLink="/contact">{{ content().cta.button }}</a>
+	</div>
+</section>

@@ -1,0 +1,120 @@
+<section class="admin-page">
+	<header class="admin-header">
+		<div>
+			<p class="eyebrow">Gestion projets</p>
+			<h1>Projets & réalisations</h1>
+			<p class="lead">{{ publishedCount() }} projets publiés</p>
+		</div>
+	</header>
+
+	<div class="admin-grid">
+		<form class="admin-form" [formGroup]="projectForm" (ngSubmit)="addProject()">
+			<h2>{{ editingId() ? 'Modifier le projet' : 'Ajouter un projet' }}</h2>
+			<div class="field">
+				<label for="title">Titre</label>
+				<input id="title" type="text" formControlName="title" />
+			</div>
+			<div class="field">
+				<label for="client">Client / média</label>
+				<input id="client" type="text" formControlName="client" />
+			</div>
+			<div class="field-row">
+				<div class="field">
+					<label for="year">Année</label>
+					<input id="year" type="text" inputmode="numeric" formControlName="year" />
+				</div>
+				<div class="field">
+					<label for="status">Statut</label>
+					<select id="status" formControlName="status">
+						@for (option of statusOptions; track option.value) {
+							<option [value]="option.value">{{ option.label }}</option>
+						}
+					</select>
+				</div>
+			</div>
+			<div class="field">
+				<label for="summary">Résumé</label>
+				<textarea id="summary" rows="4" formControlName="summary"></textarea>
+			</div>
+			<div class="button-group">
+				<button class="button primary" type="submit">
+					{{ editingId() ? 'Enregistrer les modifications' : 'Ajouter' }}
+				</button>
+				@if (editingId()) {
+					<button class="button ghost" type="button" (click)="cancelEdit()">
+						Annuler
+					</button>
+				}
+			</div>
+		</form>
+
+		<div class="list-panel">
+			<h2>Projets enregistrés</h2>
+			<ul>
+				@for (project of projects(); track project.id) {
+					<li [class.is-editing]="editingId() === project.id">
+						<div class="project-info">
+							<h3>{{ project.title }}</h3>
+							<p class="meta">{{ project.client }} · {{ project.year }}</p>
+							<p class="summary">{{ project.summary }}</p>
+							<span class="status" [class.is-published]="project.status === 'published'">
+								{{ project.status === 'published' ? 'Publié' : 'Brouillon' }}
+							</span>
+						</div>
+						<div class="project-actions">
+							<button class="button ghost" type="button" (click)="togglePublish(project.id)">
+								{{ project.status === 'published' ? 'Dépublier' : 'Publier' }}
+							</button>
+							<button class="button ghost" type="button" (click)="showPreview.set(project.id)">
+								Aperçu
+							</button>
+							<button class="button ghost" type="button" (click)="editProject(project)">
+								Modifier
+							</button>
+							<button class="button ghost danger" type="button" (click)="removeProject(project.id)">
+								Supprimer
+							</button>
+						</div>
+					</li>
+				}
+			</ul>
+		</div>
+	</div>
+
+	<!-- Preview Modal -->
+	@if (showPreview()) {
+		<div
+			class="modal-overlay"
+			tabindex="0"
+			role="presentation"
+			(click)="showPreview.set(null)"
+			(keydown.escape)="showPreview.set(null)">
+			<div
+				class="modal-content"
+				role="dialog"
+				aria-modal="true"
+				aria-labelledby="project-preview-title"
+				aria-describedby="project-preview-body"
+				(click)="$event.stopPropagation()">
+				@if (getProjectToPreview(showPreview()!)) {
+					<div class="preview-header">
+						<h2 id="project-preview-title">
+							Aperçu: {{ getProjectToPreview(showPreview()!)?.title }}
+						</h2>
+						<button class="close-button" type="button" (click)="showPreview.set(null)">×</button>
+					</div>
+					<div id="project-preview-body" class="preview-body">
+						<p class="meta">{{ getProjectToPreview(showPreview()!)?.client }} · {{ getProjectToPreview(showPreview()!)?.year }}</p>
+						<p>{{ getProjectToPreview(showPreview()!)?.summary }}</p>
+						<div class="preview-status">
+							<strong>Statut:</strong>
+							<span class="status" [class.is-published]="getProjectToPreview(showPreview()!)?.status === 'published'">
+								{{ getProjectToPreview(showPreview()!)?.status === 'published' ? 'Publié' : 'Brouillon' }}
+							</span>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+	}
+</section>

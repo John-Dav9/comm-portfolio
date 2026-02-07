@@ -1,0 +1,144 @@
+.blog-hero {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+	gap: 2.5rem;
+	align-items: center;
+	margin-bottom: 2.5rem;
+}
+
+.blog-hero h1 {
+	font-family: 'Fraunces', 'Times New Roman', serif;
+	font-size: clamp(2.1rem, 2.5vw + 1.3rem, 3rem);
+	margin: 0.6rem 0 1rem;
+}
+
+.hero-panel {
+	padding: 2rem;
+}
+
+.hero-panel ul {
+	margin: 0;
+	padding-left: 1.1rem;
+	color: var(--muted);
+	line-height: 1.6;
+}
+
+.articles-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+	gap: 1.5rem;
+	margin-bottom: 2.5rem;
+}
+
+.article-card {
+	padding: 1.7rem;
+	display: grid;
+	gap: 1.2rem;
+}
+
+.article-card header p {
+	color: var(--muted);
+	line-height: 1.6;
+	margin: 0.4rem 0 0;
+}
+
+.article-card header .meta {
+	margin: 0.5rem 0 0.6rem;
+	font-weight: 600;
+	color: var(--ink);
+}
+
+.meta-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	align-items: center;
+}
+
+.read-time {
+	font-weight: 600;
+	color: var(--ink);
+}
+
+.tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.5rem;
+}
+
+.cta-card {
+	padding: 2rem;
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1.5rem;
+}
+
+@media (max-width: 720px) {
+	.cta-card {
+		flex-direction: column;
+		align-items: flex-start;
+	}
+
+	.blog-hero {
+		gap: 2rem;
+	}
+}
+
+.resources-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+	gap: 1.4rem;
+	margin-top: 1.4rem;
+}
+
+.resource-card {
+	padding: 1.4rem;
+	display: grid;
+	gap: 0.6rem;
+}
+
+.resource-card p {
+	margin: 0;
+	color: var(--muted);
+}
+
+.resource-card .hint {
+	font-size: 0.85rem;
+	color: var(--accent-2);
+	font-weight: 600;
+}
+
+.resource-list {
+	margin: 0;
+	padding-left: 1.1rem;
+	color: var(--muted);
+	line-height: 1.6;
+}
+
+.resource-audio {
+	display: grid;
+	gap: 0.8rem;
+}
+
+.resource-audio figure {
+	margin: 0;
+	display: grid;
+	gap: 0.4rem;
+}
+
+.resource-audio audio {
+	width: 100%;
+}
+
+.resource-audio figcaption {
+	color: var(--muted);
+	font-size: 0.9rem;
+}
+
+.empty {
+	margin: 0;
+	color: var(--muted);
+	font-size: 0.95rem;
+}
