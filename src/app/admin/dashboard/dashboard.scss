@@ -1,6 +1,9 @@
 .dashboard {
 	display: grid;
 	gap: 2rem;
+	padding: 1.5rem;
+	border-radius: 24px;
+	background: var(--admin-bg);
 }
 
 .dashboard-header {
@@ -9,6 +12,15 @@
 	justify-content: space-between;
 	gap: 1.5rem;
 	align-items: center;
+}
+
+.dashboard-header h1 {
+	margin: 0.25rem 0 0.4rem;
+	font-size: clamp(1.6rem, 2vw + 1rem, 2.2rem);
+}
+
+.dashboard-header .lead {
+	margin: 0;
 }
 
 .actions {
@@ -20,10 +32,11 @@
 .button {
 	padding: 0.65rem 1.2rem;
 	border-radius: 999px;
-	background: var(--ink);
-	color: #fff;
+	background: #111827;
+	color: #f8fafc;
 	font-weight: 600;
 	text-decoration: none;
+	box-shadow: 0 8px 20px rgba(17, 24, 39, 0.18);
 }
 
 .stats-grid {
@@ -33,11 +46,11 @@
 }
 
 .stat-card {
-	background: var(--surface);
-	border-radius: var(--radius-md);
-	border: 1px solid var(--border);
+	background: var(--admin-card);
+	border-radius: 18px;
+	border: 1px solid var(--admin-border);
 	padding: 1.5rem;
-	box-shadow: var(--shadow-sm);
+	box-shadow: var(--admin-shadow);
 }
 
 .stat-card h2 {
@@ -50,10 +63,11 @@
 }
 
 .updates-card {
-	background: var(--surface);
-	border-radius: var(--radius-lg);
-	border: 1px solid var(--border);
+	background: var(--admin-card);
+	border-radius: 20px;
+	border: 1px solid var(--admin-border);
 	padding: 1.75rem;
+	box-shadow: var(--admin-shadow);
 }
 
 .updates-card ul {

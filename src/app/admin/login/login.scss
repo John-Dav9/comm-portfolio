@@ -7,13 +7,13 @@
 
 .login-panel {
 	width: min(520px, 92%);
-	background: var(--surface);
-	border-radius: var(--radius-lg);
-	border: 1px solid var(--border);
+	background: var(--admin-card);
+	border-radius: 22px;
+	border: 1px solid var(--admin-border);
 	padding: 2.5rem;
 	display: grid;
 	gap: 2rem;
-	box-shadow: var(--shadow-lg);
+	box-shadow: var(--admin-shadow);
 }
 
 .login-form {
@@ -33,7 +33,7 @@ label {
 
 input {
 	border-radius: var(--radius-sm);
-	border: 1px solid rgba(20, 22, 31, 0.2);
+	border: 1px solid rgba(15, 23, 42, 0.18);
 	padding: 0.75rem 0.9rem;
 	font-size: 0.95rem;
 	font-family: inherit;
@@ -45,9 +45,34 @@ input:focus {
 	outline-offset: 2px;
 }
 
+.input-with-toggle {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	align-items: center;
+	gap: 0.6rem;
+}
+
+.toggle-password {
+	border: 1px solid rgba(15, 23, 42, 0.16);
+	background: #fff;
+	border-radius: 999px;
+	padding: 0.55rem 0.9rem;
+	font-weight: 600;
+	cursor: pointer;
+	color: var(--ink-soft);
+}
+
+.toggle-password:focus-visible {
+	outline: 2px solid rgba(42, 157, 143, 0.45);
+	outline-offset: 2px;
+}
+
 .button.primary {
 	border: none;
 	cursor: pointer;
+	background: #111827;
+	color: #f8fafc;
+	box-shadow: 0 10px 24px rgba(17, 24, 39, 0.18);
 }
 
 .button.primary[disabled] {

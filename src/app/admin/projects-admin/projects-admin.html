@@ -2,48 +2,117 @@
 	<header class="admin-header">
 		<div>
 			<p class="eyebrow">Gestion projets</p>
-			<h1>Projets & réalisations</h1>
+			<h1>Projets & études de cas</h1>
 			<p class="lead">{{ publishedCount() }} projets publiés</p>
+		</div>
+		<div class="lang-toggle" role="group" aria-label="Langue du formulaire">
+			<button type="button" class="toggle-btn" [class.is-active]="activeLang() === 'fr'" (click)="setLang('fr')">FR</button>
+			<button type="button" class="toggle-btn" [class.is-active]="activeLang() === 'en'" (click)="setLang('en')">EN</button>
 		</div>
 	</header>
 
 	<div class="admin-grid">
 		<form class="admin-form" [formGroup]="projectForm" (ngSubmit)="addProject()">
 			<h2>{{ editingId() ? 'Modifier le projet' : 'Ajouter un projet' }}</h2>
-			<div class="field">
-				<label for="title">Titre</label>
-				<input id="title" type="text" formControlName="title" />
-			</div>
-			<div class="field">
-				<label for="client">Client / média</label>
-				<input id="client" type="text" formControlName="client" />
-			</div>
+
 			<div class="field-row">
-				<div class="field">
-					<label for="year">Année</label>
-					<input id="year" type="text" inputmode="numeric" formControlName="year" />
-				</div>
 				<div class="field">
 					<label for="status">Statut</label>
 					<select id="status" formControlName="status">
-						@for (option of statusOptions; track option.value) {
-							<option [value]="option.value">{{ option.label }}</option>
-						}
+						<option value="draft">Brouillon</option>
+						<option value="published">Publié</option>
 					</select>
 				</div>
+				<div class="field">
+					<label for="sortIndex">Ordre d’affichage</label>
+					<input id="sortIndex" type="number" min="1" formControlName="sortIndex" />
+				</div>
 			</div>
-			<div class="field">
-				<label for="summary">Résumé</label>
-				<textarea id="summary" rows="4" formControlName="summary"></textarea>
-			</div>
+
+			@if (activeLang() === 'fr') {
+				<div class="lang-panel" formGroupName="fr">
+					<p class="lang-label">Version française</p>
+					<div class="field">
+						<label for="category-fr">Catégorie</label>
+						<input id="category-fr" type="text" formControlName="category" />
+					</div>
+					<div class="field">
+						<label for="title-fr">Titre</label>
+						<input id="title-fr" type="text" formControlName="title" />
+					</div>
+					<div class="field-row">
+						<div class="field">
+							<label for="client-fr">Client / média</label>
+							<input id="client-fr" type="text" formControlName="client" />
+						</div>
+						<div class="field">
+							<label for="year-fr">Année</label>
+							<input id="year-fr" type="text" formControlName="year" />
+						</div>
+					</div>
+					<div class="field">
+						<label for="context-fr">Contexte</label>
+						<textarea id="context-fr" rows="3" formControlName="context"></textarea>
+					</div>
+					<div class="field">
+						<label for="mission-fr">Mission</label>
+						<textarea id="mission-fr" rows="3" formControlName="mission"></textarea>
+					</div>
+					<div class="field">
+						<label for="deliverables-fr">Livrables (virgules)</label>
+						<input id="deliverables-fr" type="text" formControlName="deliverables" />
+					</div>
+					<div class="field">
+						<label for="results-fr">Résultats (virgules)</label>
+						<input id="results-fr" type="text" formControlName="results" />
+					</div>
+				</div>
+			} @else {
+				<div class="lang-panel" formGroupName="en">
+					<p class="lang-label">English version</p>
+					<div class="field">
+						<label for="category-en">Category</label>
+						<input id="category-en" type="text" formControlName="category" />
+					</div>
+					<div class="field">
+						<label for="title-en">Title</label>
+						<input id="title-en" type="text" formControlName="title" />
+					</div>
+					<div class="field-row">
+						<div class="field">
+							<label for="client-en">Client</label>
+							<input id="client-en" type="text" formControlName="client" />
+						</div>
+						<div class="field">
+							<label for="year-en">Year</label>
+							<input id="year-en" type="text" formControlName="year" />
+						</div>
+					</div>
+					<div class="field">
+						<label for="context-en">Context</label>
+						<textarea id="context-en" rows="3" formControlName="context"></textarea>
+					</div>
+					<div class="field">
+						<label for="mission-en">Mission</label>
+						<textarea id="mission-en" rows="3" formControlName="mission"></textarea>
+					</div>
+					<div class="field">
+						<label for="deliverables-en">Deliverables (comma)</label>
+						<input id="deliverables-en" type="text" formControlName="deliverables" />
+					</div>
+					<div class="field">
+						<label for="results-en">Results (comma)</label>
+						<input id="results-en" type="text" formControlName="results" />
+					</div>
+				</div>
+			}
+
 			<div class="button-group">
 				<button class="button primary" type="submit">
 					{{ editingId() ? 'Enregistrer les modifications' : 'Ajouter' }}
 				</button>
 				@if (editingId()) {
-					<button class="button ghost" type="button" (click)="cancelEdit()">
-						Annuler
-					</button>
+					<button class="button ghost" type="button" (click)="cancelEdit()">Annuler</button>
 				}
 			</div>
 		</form>
@@ -54,24 +123,23 @@
 				@for (project of projects(); track project.id) {
 					<li [class.is-editing]="editingId() === project.id">
 						<div class="project-info">
-							<h3>{{ project.title }}</h3>
-							<p class="meta">{{ project.client }} · {{ project.year }}</p>
-							<p class="summary">{{ project.summary }}</p>
+							<h3>{{ project.content[activeLang()].title }}</h3>
+							<p class="meta">
+								{{ project.content[activeLang()].client }} · {{ project.content[activeLang()].year }}
+							</p>
+							<p class="summary">{{ project.content[activeLang()].context }}</p>
 							<span class="status" [class.is-published]="project.status === 'published'">
 								{{ project.status === 'published' ? 'Publié' : 'Brouillon' }}
 							</span>
 						</div>
 						<div class="project-actions">
-							<button class="button ghost" type="button" (click)="togglePublish(project.id)">
+							<button class="button ghost" type="button" (click)="togglePublish(project)">
 								{{ project.status === 'published' ? 'Dépublier' : 'Publier' }}
-							</button>
-							<button class="button ghost" type="button" (click)="showPreview.set(project.id)">
-								Aperçu
 							</button>
 							<button class="button ghost" type="button" (click)="editProject(project)">
 								Modifier
 							</button>
-							<button class="button ghost danger" type="button" (click)="removeProject(project.id)">
+							<button class="button ghost danger" type="button" (click)="removeProject(project)">
 								Supprimer
 							</button>
 						</div>
@@ -80,41 +148,4 @@
 			</ul>
 		</div>
 	</div>
-
-	<!-- Preview Modal -->
-	@if (showPreview()) {
-		<div
-			class="modal-overlay"
-			tabindex="0"
-			role="presentation"
-			(click)="showPreview.set(null)"
-			(keydown.escape)="showPreview.set(null)">
-			<div
-				class="modal-content"
-				role="dialog"
-				aria-modal="true"
-				aria-labelledby="project-preview-title"
-				aria-describedby="project-preview-body"
-				(click)="$event.stopPropagation()">
-				@if (getProjectToPreview(showPreview()!)) {
-					<div class="preview-header">
-						<h2 id="project-preview-title">
-							Aperçu: {{ getProjectToPreview(showPreview()!)?.title }}
-						</h2>
-						<button class="close-button" type="button" (click)="showPreview.set(null)">×</button>
-					</div>
-					<div id="project-preview-body" class="preview-body">
-						<p class="meta">{{ getProjectToPreview(showPreview()!)?.client }} · {{ getProjectToPreview(showPreview()!)?.year }}</p>
-						<p>{{ getProjectToPreview(showPreview()!)?.summary }}</p>
-						<div class="preview-status">
-							<strong>Statut:</strong>
-							<span class="status" [class.is-published]="getProjectToPreview(showPreview()!)?.status === 'published'">
-								{{ getProjectToPreview(showPreview()!)?.status === 'published' ? 'Publié' : 'Brouillon' }}
-							</span>
-						</div>
-					</div>
-				}
-			</div>
-		</div>
-	}
 </section>

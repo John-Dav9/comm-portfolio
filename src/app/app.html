@@ -1,11 +1,25 @@
 <a class="skip-link" href="#main-content">Aller au contenu</a>
 
 <div class="app-shell">
+  @if (previewMode()) {
+    <div class="preview-bar" role="status" aria-live="polite">
+      <div class="container preview-content">
+        <p>Preview live actif</p>
+        <div class="preview-actions">
+          <a class="button ghost" routerLink="/admin/content">Retour à l’admin</a>
+          <button class="button primary" type="button" (click)="exitPreview()">Quitter le preview</button>
+        </div>
+      </div>
+    </div>
+  }
   <header class="site-header">
     <div class="container header-content">
       <div class="brand">
-        <p class="brand-title">Carnelle Nguepi</p>
-        <p class="brand-subtitle">{{ brandSubtitle() }}</p>
+        @if (header().brandLogoUrl) {
+          <img class="brand-logo" [src]="header().brandLogoUrl" [alt]="header().brandLogoAlt" />
+        }
+        <p class="brand-title">{{ header().brandTitle }}</p>
+        <p class="brand-subtitle">{{ header().subtitle }}</p>
       </div>
 
       <div class="lang-switch" role="group" aria-label="Langue">
@@ -58,12 +72,12 @@
             EN
           </button>
         </div>
-        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">{{ navLabels().home }}</a>
-        <a routerLink="/about" routerLinkActive="active" (click)="closeMenu()">{{ navLabels().about }}</a>
-        <a routerLink="/projects" routerLinkActive="active" (click)="closeMenu()">{{ navLabels().projects }}</a>
-        <a routerLink="/blog" routerLinkActive="active" (click)="closeMenu()">{{ navLabels().blog }}</a>
-        <a routerLink="/contact" routerLinkActive="active" (click)="closeMenu()">{{ navLabels().contact }}</a>
-        <a routerLink="/admin/login" class="nav-cta" (click)="closeMenu()">{{ navLabels().admin }}</a>
+        <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }" (click)="closeMenu()">{{ header().nav.home }}</a>
+        <a routerLink="/about" routerLinkActive="active" (click)="closeMenu()">{{ header().nav.about }}</a>
+        <a routerLink="/projects" routerLinkActive="active" (click)="closeMenu()">{{ header().nav.projects }}</a>
+        <a routerLink="/blog" routerLinkActive="active" (click)="closeMenu()">{{ header().nav.blog }}</a>
+        <a routerLink="/contact" routerLinkActive="active" (click)="closeMenu()">{{ header().nav.contact }}</a>
+        <a routerLink="/admin/login" class="nav-cta" (click)="closeMenu()">{{ header().nav.admin }}</a>
       </nav>
     </div>
   </header>
@@ -76,11 +90,11 @@
 
   <footer class="site-footer">
     <div class="container footer-content">
-      <p>© 2026 Carnelle Nguepi. {{ footerLabels().rights }}</p>
+      <p>{{ footer().copyright }} {{ footer().rights }}</p>
       <div class="footer-links">
-        <a href="mailto:contact@carnellenguepi.com">contact@carnellenguepi.com</a>
+        <a [href]="'mailto:' + footer().email">{{ footer().email }}</a>
         <span aria-hidden="true">•</span>
-        <a routerLink="/contact">{{ footerLabels().contact }}</a>
+        <a routerLink="/contact">{{ footer().contactLabel }}</a>
       </div>
     </div>
   </footer>

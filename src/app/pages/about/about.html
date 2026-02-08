@@ -12,6 +12,11 @@
 			}
 		</div>
 	</div>
+	@if (content().hero.imageUrl) {
+		<div class="about-media card">
+			<img [src]="content().hero.imageUrl" [alt]="content().hero.imageAlt" />
+		</div>
+	}
 	<div class="about-card card">
 		<h2>{{ content().hero.cardTitle }}</h2>
 		<ul>
@@ -70,6 +75,16 @@
 			<span class="partner-pill">{{ partner }}</span>
 		}
 	</div>
+	@if (content().partners.logos.length > 0) {
+		<div class="partner-logo-grid">
+			@for (logo of content().partners.logos; track logo.url) {
+				<figure class="partner-logo-card">
+					<img [src]="logo.url" [alt]="logo.name" />
+					<figcaption>{{ logo.name }}</figcaption>
+				</figure>
+			}
+		</div>
+	}
 </section>
 
 <section class="partner-media section">

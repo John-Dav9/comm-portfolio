@@ -15,8 +15,14 @@ export class I18nService {
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
+      const params = new URLSearchParams(window.location.search);
+      const queryLang = params.get('lang');
+      if (queryLang === 'fr' || queryLang === 'en') {
+        this.lang.set(queryLang);
+      }
+
       const stored = localStorage.getItem(STORAGE_KEY) as AppLanguage | null;
-      if (stored === 'fr' || stored === 'en') {
+      if (!queryLang && (stored === 'fr' || stored === 'en')) {
         this.lang.set(stored);
       }
 

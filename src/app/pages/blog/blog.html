@@ -4,6 +4,11 @@
 		<h1>{{ content().hero.title }}</h1>
 		<p class="lead">{{ content().hero.lead }}</p>
 	</div>
+	@if (content().hero.imageUrl) {
+		<div class="hero-media card">
+			<img [src]="content().hero.imageUrl" [alt]="content().hero.imageAlt" />
+		</div>
+	}
 	<div class="hero-panel card">
 		<h2>{{ content().hero.listTitle }}</h2>
 		<ul>

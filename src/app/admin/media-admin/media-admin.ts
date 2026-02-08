@@ -1,7 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MediaLibraryService } from '../../services/media-library';
-import { MediaUploadService, MediaCategory, MediaItem, MediaType } from '../../services/media-upload';
+import { MediaCategory, MediaItem, MediaType } from '../../services/media-upload';
+import { SupabaseService } from '../../services/supabase';
 
 @Component({
   selector: 'app-media-admin',
@@ -117,6 +118,9 @@ import { MediaUploadService, MediaCategory, MediaItem, MediaType } from '../../s
     .admin-page {
       display: grid;
       gap: 2rem;
+      padding: 1.5rem;
+      border-radius: 24px;
+      background: var(--admin-bg);
     }
 
     .admin-header {
@@ -138,13 +142,13 @@ import { MediaUploadService, MediaCategory, MediaItem, MediaType } from '../../s
 
     .upload-panel,
     .media-grid {
-      background: var(--surface);
-      border-radius: var(--radius-lg);
-      border: 1px solid var(--border);
+      background: var(--admin-card);
+      border-radius: 20px;
+      border: 1px solid var(--admin-border);
       padding: 1.6rem;
       display: grid;
       gap: 1rem;
-      box-shadow: var(--shadow-sm);
+      box-shadow: var(--admin-shadow);
     }
 
     .field {
@@ -160,14 +164,14 @@ import { MediaUploadService, MediaCategory, MediaItem, MediaType } from '../../s
     input,
     select {
       border-radius: var(--radius-sm);
-      border: 1px solid rgba(20, 22, 31, 0.2);
+      border: 1px solid rgba(15, 23, 42, 0.18);
       padding: 0.7rem 0.85rem;
       font-family: inherit;
       background: #fff;
     }
 
     .upload-area {
-      border: 2px dashed rgba(20, 22, 31, 0.2);
+      border: 2px dashed rgba(15, 23, 42, 0.18);
       border-radius: 16px;
       padding: 3rem;
       text-align: center;
@@ -242,8 +246,8 @@ import { MediaUploadService, MediaCategory, MediaItem, MediaType } from '../../s
     }
 
     .media-item {
-      border: 1px solid var(--border);
-      border-radius: var(--radius-md);
+      border: 1px solid var(--admin-border);
+      border-radius: 16px;
       overflow: hidden;
       display: grid;
       grid-template-rows: auto 1fr auto;
@@ -265,7 +269,7 @@ import { MediaUploadService, MediaCategory, MediaItem, MediaType } from '../../s
       display: grid;
       place-items: center;
       height: 160px;
-      background: var(--surface-alt);
+      background: #f7f8fb;
       color: var(--ink);
       font-weight: 600;
       text-transform: uppercase;
@@ -337,7 +341,7 @@ import { MediaUploadService, MediaCategory, MediaItem, MediaType } from '../../s
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MediaAdmin {
-  private readonly mediaUploadService = inject(MediaUploadService);
+  private readonly supabase = inject(SupabaseService).client;
   private readonly mediaLibrary = inject(MediaLibraryService);
 
   readonly mediaItems = computed(() => this.mediaLibrary.items());
@@ -391,7 +395,7 @@ export class MediaAdmin {
     }
   }
 
-  private uploadFile(file: File) {
+  private async uploadFile(file: File) {
     if (!this.isValidFile(file)) {
       this.uploadError.set('Format ou taille de fichier invalide');
       return;
@@ -400,31 +404,44 @@ export class MediaAdmin {
     this.isUploading.set(true);
     this.uploadError.set('');
 
-    this.mediaUploadService.uploadImagePromise(file, 'media').then(
-      (url) => {
-        const type = this.getMediaType(file.type);
-        const newItem: MediaItem = {
-          id: `${Date.now()}-${file.name}`,
-          name: file.name,
-          title: this.mediaTitle().trim() || file.name,
-          description: '',
-          url: url,
-          uploadedAt: Date.now(),
-          type: type,
-          category: this.mediaCategory()
-        };
+    try {
+      const type = this.getMediaType(file.type);
+      const path = `media/${Date.now()}-${file.name}`;
+      const { error: uploadError } = await this.supabase.storage
+        .from('media')
+        .upload(path, file, { upsert: true, contentType: file.type });
 
-        this.mediaLibrary.addItem(newItem);
-        this.uploadSuccess.set(`${file.name} téléchargé avec succès`);
-        this.isUploading.set(false);
-        this.mediaTitle.set('');
-      },
-      (error) => {
-        console.error('Upload error:', error);
-        this.uploadError.set('Erreur lors du téléchargement');
-        this.isUploading.set(false);
+      if (uploadError) {
+        throw uploadError;
       }
-    );
+
+      const { data } = this.supabase.storage.from('media').getPublicUrl(path);
+      const url = data.publicUrl;
+
+      const newItem: Omit<MediaItem, 'id'> = {
+        name: file.name,
+        title: this.mediaTitle().trim() || file.name,
+        description: '',
+        url: url,
+        path: path,
+        uploadedAt: Date.now(),
+        type: type,
+        category: this.mediaCategory()
+      };
+
+      const saved = await this.mediaLibrary.addItem(newItem);
+      if (!saved) {
+        throw new Error('Impossible d’enregistrer le média');
+      }
+
+      this.uploadSuccess.set(`${file.name} téléchargé avec succès`);
+      this.isUploading.set(false);
+      this.mediaTitle.set('');
+    } catch (error) {
+      console.error('Upload error:', error);
+      this.uploadError.set('Erreur lors du téléchargement');
+      this.isUploading.set(false);
+    }
   }
 
   private isValidFile(file: File): boolean {
@@ -473,6 +490,6 @@ export class MediaAdmin {
   }
 
   deleteMedia(id: string) {
-    this.mediaLibrary.removeItem(id);
+    void this.mediaLibrary.removeItem(id);
   }
 }

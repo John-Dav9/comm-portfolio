@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { I18nService } from './services/i18n';
-import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { SiteContentService } from './services/site-content';
 
 @Component({
   selector: 'app-root',
@@ -11,52 +12,14 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 })
 export class App {
   private readonly i18n = inject(I18nService);
+  private readonly siteContent = inject(SiteContentService);
+  private readonly router = inject(Router);
   protected readonly title = signal('comm-portfolio');
   readonly isMenuOpen = signal(false);
   readonly currentLang = computed(() => this.i18n.lang());
-
-  readonly navLabels = computed(() => {
-    const lang = this.i18n.lang();
-    if (lang === 'fr') {
-      return {
-        home: 'Accueil',
-        about: 'À propos',
-        projects: 'Projets',
-        blog: 'Journal',
-        contact: 'Contact',
-        admin: 'Espace admin'
-      };
-    }
-    return {
-      home: 'Home',
-      about: 'About',
-      projects: 'Projects',
-      blog: 'Journal',
-      contact: 'Contact',
-      admin: 'Admin'
-    };
-  });
-
-  readonly footerLabels = computed(() => {
-    const lang = this.i18n.lang();
-    if (lang === 'fr') {
-      return {
-        rights: 'Tous droits réservés.',
-        contact: 'Contact presse'
-      };
-    }
-    return {
-      rights: 'All rights reserved.',
-      contact: 'Press contact'
-    };
-  });
-
-  readonly brandSubtitle = computed(() => {
-    const lang = this.i18n.lang();
-    return lang === 'fr'
-      ? 'Communication · Journalisme · Présentation média'
-      : 'Communication · Journalism · Media presentation';
-  });
+  readonly header = computed(() => this.siteContent.current().header);
+  readonly footer = computed(() => this.siteContent.current().footer);
+  readonly previewMode = computed(() => this.siteContent.previewMode());
 
   toggleMenu() {
     this.isMenuOpen.update((value) => !value);
@@ -68,5 +31,13 @@ export class App {
 
   setLang(lang: 'fr' | 'en') {
     this.i18n.setLang(lang);
+  }
+
+  exitPreview() {
+    this.siteContent.clearPreview();
+    const url = new URL(window.location.href);
+    url.searchParams.delete('preview');
+    url.searchParams.delete('lang');
+    this.router.navigateByUrl(url.pathname + url.search);
   }
 }

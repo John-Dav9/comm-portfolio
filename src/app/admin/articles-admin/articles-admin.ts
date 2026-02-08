@@ -1,17 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-
-type ArticleStatus = 'draft' | 'published';
-
-interface Article {
-  id: number;
-  title: string;
-  category: string;
-  readTime: string;
-  status: ArticleStatus;
-  summary: string;
-}
+import { ArticlesService, type ArticleLocale, type ArticleRecord, type ArticleStatus } from '../../services/articles';
+import type { Language } from '../../data/site-content';
 
 @Component({
   selector: 'app-articles-admin',
@@ -23,153 +14,180 @@ interface Article {
 export class ArticlesAdmin {
   private readonly formBuilder = inject(NonNullableFormBuilder);
   private readonly document = inject(DOCUMENT);
-  private readonly nextId = signal(6);
-  readonly editingId = signal<number | null>(null);
-  readonly showPreview = signal<number | null>(null);
-
-  readonly statusOptions = [
-    { value: 'draft', label: 'Brouillon' },
-    { value: 'published', label: 'Publié' }
-  ];
-
-  readonly categoryOptions = [
-    { value: 'Journalisme', label: 'Journalisme' },
-    { value: 'Radio', label: 'Radio' },
-    { value: 'TV', label: 'TV' },
-    { value: 'Événementiel', label: 'Événementiel' },
-    { value: 'Digital', label: 'Communication digitale' }
-  ];
-
-  readonly articles = signal<Article[]>([
-    {
-      id: 1,
-      title: 'Construire un portfolio journaliste',
-      category: 'Journalisme',
-      readTime: '6 min',
-      status: 'published',
-      summary: 'Structurer les preuves et gagner en crédibilité.'
-    },
-    {
-      id: 2,
-      title: 'Showreel TV : les 3 minutes clés',
-      category: 'TV',
-      readTime: '5 min',
-      status: 'draft',
-      summary: 'Éditer un montage qui valorise la présence caméra.'
-    },
-    {
-      id: 3,
-      title: 'Portfolio audio pour animateur radio',
-      category: 'Radio',
-      readTime: '4 min',
-      status: 'published',
-      summary: 'Sélection des extraits et identité sonore.'
-    }
-  ]);
-
+  private readonly articlesService = inject(ArticlesService);
+  readonly activeLang = signal<Language>('fr');
+  readonly editingId = signal<string | null>(null);
+  readonly articles = computed(() => this.articlesService.items());
   readonly publishedCount = computed(
     () => this.articles().filter((article) => article.status === 'published').length
   );
 
   readonly articleForm = this.formBuilder.group({
-    title: ['', [Validators.required, Validators.minLength(3)]],
-    category: ['Journalisme', Validators.required],
-    readTime: ['', [Validators.required, Validators.pattern(/^[0-9]+\s?min$/)]],
     status: ['draft', Validators.required],
-    summary: ['', [Validators.required, Validators.minLength(10)]]
+    sortIndex: [1, [Validators.required, Validators.min(1)]],
+    fr: this.createLocaleGroup({
+      title: '',
+      category: '',
+      readTime: '',
+      author: '',
+      date: '',
+      summary: '',
+      tags: []
+    }),
+    en: this.createLocaleGroup({
+      title: '',
+      category: '',
+      readTime: '',
+      author: '',
+      date: '',
+      summary: '',
+      tags: []
+    })
   });
 
-  addArticle() {
+  setLang(lang: Language) {
+    this.activeLang.set(lang);
+  }
+
+  async addArticle() {
     if (this.articleForm.invalid) {
       this.articleForm.markAllAsTouched();
       return;
     }
 
-    const formValue = this.articleForm.getRawValue();
-    const status = formValue.status as ArticleStatus;
-    
-    if (this.editingId() !== null) {
-      // Update existing article
-      this.articles.update((items) =>
-        items.map((article) =>
-          article.id === this.editingId()
-            ? {
-                ...article,
-                title: formValue.title,
-                category: formValue.category,
-                readTime: formValue.readTime,
-                status: status,
-                summary: formValue.summary
-              }
-            : article
-        )
-      );
+    const record = this.buildRecord();
+    const currentId = this.editingId();
+
+    if (currentId !== null) {
+      const updated = await this.articlesService.update({ ...record, id: currentId });
+      if (!updated) {
+        return;
+      }
       this.editingId.set(null);
     } else {
-      // Add new article
-      const article = {
-        id: this.nextId(),
-        title: formValue.title,
-        category: formValue.category,
-        readTime: formValue.readTime,
-        status: status,
-        summary: formValue.summary
-      };
-
-      this.articles.update((items) => [...items, article]);
-      this.nextId.update((value) => value + 1);
+      await this.articlesService.add(record);
     }
 
-    this.articleForm.reset({
-      title: '',
-      category: 'Journalisme',
-      readTime: '5 min',
-      status: 'draft',
-      summary: ''
-    });
+    this.resetForm();
   }
 
-  editArticle(article: Article) {
+  editArticle(article: ArticleRecord) {
     this.editingId.set(article.id);
     this.articleForm.patchValue({
-      title: article.title,
-      category: article.category,
-      readTime: article.readTime,
       status: article.status,
-      summary: article.summary
+      sortIndex: article.sortIndex,
+      fr: this.localeToForm(article.content.fr),
+      en: this.localeToForm(article.content.en)
     });
     this.document.defaultView?.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  async togglePublish(article: ArticleRecord) {
+    const nextStatus: ArticleStatus = article.status === 'published' ? 'draft' : 'published';
+    await this.articlesService.update({ ...article, status: nextStatus });
+  }
+
+  async removeArticle(article: ArticleRecord) {
+    await this.articlesService.remove(article.id);
+  }
+
   cancelEdit() {
     this.editingId.set(null);
+    this.resetForm();
+  }
+
+  private resetForm() {
+    const nextIndex = this.articles().length + 1;
     this.articleForm.reset({
-      title: '',
-      category: 'Journalisme',
-      readTime: '5 min',
       status: 'draft',
-      summary: ''
+      sortIndex: nextIndex,
+      fr: this.createLocaleFormValue(),
+      en: this.createLocaleFormValue()
     });
   }
 
-  togglePublish(articleId: number) {
-    this.articles.update((items) =>
-      items.map((article) =>
-        article.id === articleId
-          ? {
-              ...article,
-              status: article.status === 'published' ? 'draft' : 'published'
-            }
-          : article
-      )
-    );
+  private createLocaleGroup(value: ArticleLocale) {
+    return this.formBuilder.group({
+      title: [value.title, [Validators.required, Validators.minLength(3)]],
+      category: [value.category, [Validators.required, Validators.minLength(2)]],
+      readTime: [value.readTime, [Validators.required, Validators.minLength(2)]],
+      author: [value.author, [Validators.required, Validators.minLength(2)]],
+      date: [value.date, [Validators.required, Validators.minLength(2)]],
+      summary: [value.summary, [Validators.required, Validators.minLength(10)]],
+      tags: [value.tags.join(', ')]
+    });
   }
 
-  removeArticle(articleId: number) {
-    this.articles.update((items) => items.filter((article) => article.id !== articleId));
+  private createLocaleValue(): ArticleLocale {
+    return {
+      title: '',
+      category: '',
+      readTime: '',
+      author: '',
+      date: '',
+      summary: '',
+      tags: []
+    };
   }
 
-  getArticleToPreview(articleId: number) {
-    return this.articles().find((a) => a.id === articleId);
+  private createLocaleFormValue() {
+    return {
+      title: '',
+      category: '',
+      readTime: '',
+      author: '',
+      date: '',
+      summary: '',
+      tags: ''
+    };
+  }
+
+  private localeToForm(locale: ArticleLocale) {
+    return {
+      title: locale.title,
+      category: locale.category,
+      readTime: locale.readTime,
+      author: locale.author,
+      date: locale.date,
+      summary: locale.summary,
+      tags: locale.tags.join(', ')
+    };
+  }
+
+  private buildRecord(): Omit<ArticleRecord, 'id'> {
+    const raw = this.articleForm.getRawValue();
+    const sortIndex = Number(raw.sortIndex) || 1;
+    const status = raw.status as ArticleStatus;
+    const fr = this.formToLocale(raw.fr);
+    const en = this.formToLocale(raw.en);
+
+    return {
+      status,
+      sortIndex,
+      content: { fr, en }
+    };
+  }
+
+  private formToLocale(value: {
+    title: string;
+    category: string;
+    readTime: string;
+    author: string;
+    date: string;
+    summary: string;
+    tags: string;
+  }): ArticleLocale {
+    return {
+      title: value.title.trim(),
+      category: value.category.trim(),
+      readTime: value.readTime.trim(),
+      author: value.author.trim(),
+      date: value.date.trim(),
+      summary: value.summary.trim(),
+      tags: value.tags
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0)
+    };
   }
 }

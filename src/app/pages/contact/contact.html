@@ -77,10 +77,20 @@
 			}
 		</div>
 
-		<button class="button primary" type="submit">{{ content().form.submit }}</button>
+		<button class="button primary" type="submit" [disabled]="loading()">
+			@if (loading()) {
+				<span>Envoi…</span>
+			} @else {
+				<span>{{ content().form.submit }}</span>
+			}
+		</button>
 
-		@if (submitted() && contactForm.valid) {
-			<p class="success" role="status">{{ content().form.success }}</p>
+		@if (successMessage()) {
+			<p class="success" role="status">{{ successMessage() }}</p>
+		}
+
+		@if (errorMessage()) {
+			<p class="error" role="alert">{{ errorMessage() }}</p>
 		}
 	</form>
 </section>

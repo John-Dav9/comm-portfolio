@@ -1,9 +1,8 @@
-import { inject, Injectable, signal, effect } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID } from '@angular/core';
 import type { MediaItem, MediaType, MediaCategory } from './media-upload';
-
-const STORAGE_KEY = 'carnelle-media-library';
+import { SupabaseService } from './supabase';
 
 const seedItems: MediaItem[] = [
   {
@@ -73,36 +72,67 @@ const seedItems: MediaItem[] = [
 })
 export class MediaLibraryService {
   private readonly platformId = inject(PLATFORM_ID);
+  private readonly supabase = inject(SupabaseService).client;
   readonly items = signal<MediaItem[]>([]);
 
   constructor() {
+    this.items.set(seedItems);
     if (isPlatformBrowser(this.platformId)) {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        try {
-          const parsed = JSON.parse(stored) as MediaItem[];
-          this.items.set(parsed);
-        } catch {
-          this.items.set(seedItems);
-        }
-      } else {
-        this.items.set(seedItems);
-      }
-
-      effect(() => {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(this.items()));
-      });
-    } else {
-      this.items.set(seedItems);
+      void this.refresh();
     }
   }
 
-  addItem(item: MediaItem) {
-    this.items.update((current) => [item, ...current]);
+  async refresh() {
+    const { data, error } = await this.supabase
+      .from('media_items')
+      .select('*')
+      .order('uploaded_at', { ascending: false });
+
+    if (error || !data) {
+      return;
+    }
+
+    const mapped = data.map((row) => this.mapRow(row));
+    this.items.set(mapped);
   }
 
-  removeItem(id: string) {
-    this.items.update((current) => current.filter((item) => item.id !== id));
+  async addItem(item: Omit<MediaItem, 'id'>) {
+    const { data, error } = await this.supabase
+      .from('media_items')
+      .insert({
+        name: item.name,
+        title: item.title,
+        description: item.description,
+        url: item.url,
+        path: item.path ?? null,
+        uploaded_at: new Date(item.uploadedAt).toISOString(),
+        type: item.type,
+        category: item.category
+      })
+      .select()
+      .single();
+
+    if (error || !data) {
+      return null;
+    }
+
+    const mapped = this.mapRow(data);
+    this.items.update((current) => [mapped, ...current]);
+    return mapped;
+  }
+
+  async removeItem(id: string) {
+    const item = this.items().find((current) => current.id === id);
+    if (!item) {
+      return;
+    }
+
+    if (item.path) {
+      await this.supabase.storage.from('media').remove([item.path]);
+    }
+
+    await this.supabase.from('media_items').delete().eq('id', id);
+    this.items.update((current) => current.filter((currentItem) => currentItem.id !== id));
   }
 
   getByCategory(category: MediaCategory) {
@@ -111,5 +141,29 @@ export class MediaLibraryService {
 
   getByType(type: MediaType) {
     return this.items().filter((item) => item.type === type);
+  }
+
+  private mapRow(row: {
+    id: string;
+    name: string;
+    title: string;
+    description: string;
+    url: string;
+    path: string | null;
+    uploaded_at: string;
+    type: MediaType;
+    category: MediaCategory;
+  }): MediaItem {
+    return {
+      id: row.id,
+      name: row.name,
+      title: row.title,
+      description: row.description,
+      url: row.url,
+      path: row.path ?? undefined,
+      uploadedAt: Date.parse(row.uploaded_at),
+      type: row.type,
+      category: row.category
+    };
   }
 }

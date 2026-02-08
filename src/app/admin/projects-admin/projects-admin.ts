@@ -1,17 +1,8 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { CommonModule, DOCUMENT } from '@angular/common';
 import { NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-
-type ProjectStatus = 'draft' | 'published';
-
-interface Project {
-  id: number;
-  title: string;
-  client: string;
-  year: string;
-  status: ProjectStatus;
-  summary: string;
-}
+import { ProjectsService, type ProjectLocale, type ProjectRecord, type ProjectStatus } from '../../services/projects';
+import type { Language } from '../../data/site-content';
 
 @Component({
   selector: 'app-projects-admin',
@@ -23,153 +14,192 @@ interface Project {
 export class ProjectsAdmin {
   private readonly formBuilder = inject(NonNullableFormBuilder);
   private readonly document = inject(DOCUMENT);
-  private readonly nextId = signal(6);
-  readonly editingId = signal<number | null>(null);
-  readonly showPreview = signal<number | null>(null);
-
-  readonly statusOptions = [
-    { value: 'draft', label: 'Brouillon' },
-    { value: 'published', label: 'Publié' }
-  ];
-
-  readonly categoryOptions = [
-    { value: 'Journalisme', label: 'Journalisme' },
-    { value: 'Radio', label: 'Radio' },
-    { value: 'TV', label: 'TV' },
-    { value: 'Événementiel', label: 'Événementiel' },
-    { value: 'Digital', label: 'Communication digitale' }
-  ];
-
-  readonly projects = signal<Project[]>([
-    {
-      id: 1,
-      title: 'Enquête sociétale long format',
-      client: 'Rédaction Regard',
-      year: '2025',
-      status: 'published',
-      summary: 'Dossier complet + diffusion multi-support.'
-    },
-    {
-      id: 2,
-      title: 'Concept émission quotidienne',
-      client: 'Radio Horizon 105.7',
-      year: '2024',
-      status: 'published',
-      summary: 'Identité sonore et plan éditorial hebdo.'
-    },
-    {
-      id: 3,
-      title: 'Showreel présentateur',
-      client: 'Studio Visio',
-      year: '2025',
-      status: 'draft',
-      summary: 'Montage 90 secondes avec extraits studio.'
-    }
-  ]);
+  private readonly projectsService = inject(ProjectsService);
+  readonly activeLang = signal<Language>('fr');
+  readonly editingId = signal<string | null>(null);
+  readonly projects = computed(() => this.projectsService.items());
 
   readonly publishedCount = computed(
     () => this.projects().filter((project) => project.status === 'published').length
   );
 
   readonly projectForm = this.formBuilder.group({
-    title: ['', [Validators.required, Validators.minLength(3)]],
-    client: ['', [Validators.required, Validators.minLength(2)]],
-    year: ['', [Validators.required, Validators.pattern(/^[0-9]{4}$/)]],
     status: ['draft', Validators.required],
-    summary: ['', [Validators.required, Validators.minLength(10)]]
+    sortIndex: [1, [Validators.required, Validators.min(1)]],
+    fr: this.createLocaleGroup({
+      category: '',
+      title: '',
+      client: '',
+      year: '',
+      context: '',
+      mission: '',
+      deliverables: [],
+      results: []
+    }),
+    en: this.createLocaleGroup({
+      category: '',
+      title: '',
+      client: '',
+      year: '',
+      context: '',
+      mission: '',
+      deliverables: [],
+      results: []
+    })
   });
 
-  addProject() {
+  setLang(lang: Language) {
+    this.activeLang.set(lang);
+  }
+
+  async addProject() {
     if (this.projectForm.invalid) {
       this.projectForm.markAllAsTouched();
       return;
     }
 
-    const formValue = this.projectForm.getRawValue();
-    const status = formValue.status as ProjectStatus;
-    
-    if (this.editingId() !== null) {
-      // Update existing project
-      this.projects.update((items) =>
-        items.map((project) =>
-          project.id === this.editingId()
-            ? {
-                ...project,
-                title: formValue.title,
-                client: formValue.client,
-                year: formValue.year,
-                status: status,
-                summary: formValue.summary
-              }
-            : project
-        )
-      );
+    const record = this.buildRecord();
+    const currentId = this.editingId();
+
+    if (currentId !== null) {
+      const updated = await this.projectsService.update({ ...record, id: currentId });
+      if (!updated) {
+        return;
+      }
       this.editingId.set(null);
     } else {
-      // Add new project
-      const project = {
-        id: this.nextId(),
-        title: formValue.title,
-        client: formValue.client,
-        year: formValue.year,
-        status: status,
-        summary: formValue.summary
-      };
-
-      this.projects.update((items) => [...items, project]);
-      this.nextId.update((value) => value + 1);
+      await this.projectsService.add(record);
     }
 
-    this.projectForm.reset({
-      title: '',
-      client: '',
-      year: '',
-      status: 'draft',
-      summary: ''
-    });
+    this.resetForm();
   }
 
-  editProject(project: Project) {
+  editProject(project: ProjectRecord) {
     this.editingId.set(project.id);
     this.projectForm.patchValue({
-      title: project.title,
-      client: project.client,
-      year: project.year,
       status: project.status,
-      summary: project.summary
+      sortIndex: project.sortIndex,
+      fr: this.localeToForm(project.content.fr),
+      en: this.localeToForm(project.content.en)
     });
     this.document.defaultView?.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  async togglePublish(project: ProjectRecord) {
+    const nextStatus: ProjectStatus = project.status === 'published' ? 'draft' : 'published';
+    await this.projectsService.update({ ...project, status: nextStatus });
+  }
+
+  async removeProject(project: ProjectRecord) {
+    await this.projectsService.remove(project.id);
+  }
+
   cancelEdit() {
     this.editingId.set(null);
+    this.resetForm();
+  }
+
+  private resetForm() {
+    const nextIndex = this.projectsService.items().length + 1;
     this.projectForm.reset({
-      title: '',
-      client: '',
-      year: '',
       status: 'draft',
-      summary: ''
+      sortIndex: nextIndex,
+      fr: this.createLocaleFormValue(),
+      en: this.createLocaleFormValue()
     });
   }
 
-  togglePublish(projectId: number) {
-    this.projects.update((items) =>
-      items.map((project) =>
-        project.id === projectId
-          ? {
-              ...project,
-              status: project.status === 'published' ? 'draft' : 'published'
-            }
-          : project
-      )
-    );
+  private createLocaleGroup(value: ProjectLocale) {
+    return this.formBuilder.group({
+      category: [value.category, [Validators.required, Validators.minLength(2)]],
+      title: [value.title, [Validators.required, Validators.minLength(3)]],
+      client: [value.client, [Validators.required, Validators.minLength(2)]],
+      year: [value.year, [Validators.required, Validators.minLength(4)]],
+      context: [value.context, [Validators.required, Validators.minLength(10)]],
+      mission: [value.mission, [Validators.required, Validators.minLength(10)]],
+      deliverables: [value.deliverables.join(', ')],
+      results: [value.results.join(', ')]
+    });
   }
 
-  removeProject(projectId: number) {
-    this.projects.update((items) => items.filter((project) => project.id !== projectId));
+  private createLocaleValue(): ProjectLocale {
+    return {
+      category: '',
+      title: '',
+      client: '',
+      year: '',
+      context: '',
+      mission: '',
+      deliverables: [],
+      results: []
+    };
   }
 
-  getProjectToPreview(projectId: number) {
-    return this.projects().find((p) => p.id === projectId);
+  private createLocaleFormValue() {
+    return {
+      category: '',
+      title: '',
+      client: '',
+      year: '',
+      context: '',
+      mission: '',
+      deliverables: '',
+      results: ''
+    };
+  }
+
+  private localeToForm(locale: ProjectLocale) {
+    return {
+      category: locale.category,
+      title: locale.title,
+      client: locale.client,
+      year: locale.year,
+      context: locale.context,
+      mission: locale.mission,
+      deliverables: locale.deliverables.join(', '),
+      results: locale.results.join(', ')
+    };
+  }
+
+  private buildRecord(): Omit<ProjectRecord, 'id'> {
+    const raw = this.projectForm.getRawValue();
+    const sortIndex = Number(raw.sortIndex) || 1;
+    const status = raw.status as ProjectStatus;
+    const fr = this.formToLocale(raw.fr);
+    const en = this.formToLocale(raw.en);
+
+    return {
+      status,
+      sortIndex,
+      content: { fr, en }
+    };
+  }
+
+  private formToLocale(value: {
+    category: string;
+    title: string;
+    client: string;
+    year: string;
+    context: string;
+    mission: string;
+    deliverables: string;
+    results: string;
+  }): ProjectLocale {
+    return {
+      category: value.category.trim(),
+      title: value.title.trim(),
+      client: value.client.trim(),
+      year: value.year.trim(),
+      context: value.context.trim(),
+      mission: value.mission.trim(),
+      deliverables: value.deliverables
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0),
+      results: value.results
+        .split(',')
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0)
+    };
   }
 }

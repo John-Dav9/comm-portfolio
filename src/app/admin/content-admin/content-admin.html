@@ -1,0 +1,686 @@
+<section class="admin-page">
+	<header class="admin-header">
+		<div>
+			<p class="eyebrow">Contenu global</p>
+			<h1>Edition complete du site</h1>
+			<p class="lead">Tous les champs sont editables. Enregistrez pour publier.</p>
+		</div>
+		<div class="header-actions">
+			<div class="lang-toggle" role="group" aria-label="Langue du contenu">
+				<button type="button" class="toggle-btn" [class.is-active]="activeLang() === 'fr'" (click)="setLang('fr')">FR</button>
+				<button type="button" class="toggle-btn" [class.is-active]="activeLang() === 'en'" (click)="setLang('en')">EN</button>
+			</div>
+			<button class="button ghost" type="button" (click)="openPreview()">Preview live</button>
+		</div>
+	</header>
+
+	<form class="admin-form" [formGroup]="contentForm" (ngSubmit)="saveForm()">
+		@if (uploadMessage()) {
+			<p class="status-text">{{ uploadMessage() }}</p>
+		}
+
+		<section class="admin-section" formGroupName="header">
+			<h2>Header</h2>
+			<div class="field">
+				<label for="brandTitle">Nom / marque</label>
+				<input id="brandTitle" type="text" formControlName="brandTitle" />
+			</div>
+			<div class="field">
+				<label for="subtitle">Sous-titre</label>
+				<input id="subtitle" type="text" formControlName="subtitle" />
+			</div>
+			<div class="field-row">
+				<div class="field">
+					<label for="brandLogoUrl">Logo (url)</label>
+					<input id="brandLogoUrl" type="text" formControlName="brandLogoUrl" />
+				</div>
+				<div class="field">
+					<label for="brandLogoAlt">Alt logo</label>
+					<input id="brandLogoAlt" type="text" formControlName="brandLogoAlt" />
+				</div>
+				<div class="field">
+					<label for="brandLogoUpload">Uploader logo</label>
+					<input id="brandLogoUpload" type="file" accept="image/*" (change)="uploadImage($event, 'header.brandLogoUrl')" />
+				</div>
+			</div>
+			<div class="field" formGroupName="nav">
+				<label>Navigation</label>
+				<div class="field-row">
+					<input type="text" formControlName="home" placeholder="Accueil" />
+					<input type="text" formControlName="about" placeholder="A propos" />
+					<input type="text" formControlName="projects" placeholder="Projets" />
+					<input type="text" formControlName="blog" placeholder="Journal" />
+					<input type="text" formControlName="contact" placeholder="Contact" />
+					<input type="text" formControlName="admin" placeholder="Espace admin" />
+				</div>
+			</div>
+		</section>
+
+		<section class="admin-section" formGroupName="footer">
+			<h2>Footer</h2>
+			<div class="field-row">
+				<div class="field">
+					<label for="footerEmail">Email</label>
+					<input id="footerEmail" type="email" formControlName="email" />
+				</div>
+				<div class="field">
+					<label for="footerContact">Libelle contact</label>
+					<input id="footerContact" type="text" formControlName="contactLabel" />
+				</div>
+			</div>
+			<div class="field-row">
+				<div class="field">
+					<label for="footerRights">Mentions droits</label>
+					<input id="footerRights" type="text" formControlName="rights" />
+				</div>
+				<div class="field">
+					<label for="footerCopyright">Copyright</label>
+					<input id="footerCopyright" type="text" formControlName="copyright" />
+				</div>
+			</div>
+		</section>
+		<section class="admin-section" formGroupName="home">
+			<h2>Home</h2>
+			<div class="subsection" formGroupName="hero">
+				<h3>Hero</h3>
+				<div class="field-row">
+					<div class="field">
+						<label>Eyebrow</label>
+						<input type="text" formControlName="eyebrow" />
+					</div>
+					<div class="field">
+						<label>Titre</label>
+						<input type="text" formControlName="title" />
+					</div>
+				</div>
+				<div class="field">
+					<label>Chapeau</label>
+					<textarea rows="3" formControlName="lead"></textarea>
+				</div>
+				<div class="field-row">
+					<div class="field">
+						<label>Bouton principal</label>
+						<input type="text" formControlName="primary" />
+					</div>
+					<div class="field">
+						<label>Bouton secondaire</label>
+						<input type="text" formControlName="secondary" />
+					</div>
+				</div>
+				<div class="field-row">
+					<div class="field">
+						<label>Hero image url</label>
+						<input type="text" formControlName="imageUrl" />
+					</div>
+					<div class="field">
+						<label>Hero image alt</label>
+						<input type="text" formControlName="imageAlt" />
+					</div>
+					<div class="field">
+						<label>Uploader image</label>
+						<input type="file" accept="image/*" (change)="uploadImage($event, 'home.hero.imageUrl')" />
+					</div>
+				</div>
+				<div class="field">
+					<label>Tags (virgules)</label>
+					<input type="text" formControlName="tags" />
+				</div>
+			</div>
+
+			<div class="subsection" formGroupName="panel">
+				<h3>Panel</h3>
+				<div class="field-row">
+					<div class="field">
+						<label>Pill</label>
+						<input type="text" formControlName="pill" />
+					</div>
+					<div class="field">
+						<label>Titre</label>
+						<input type="text" formControlName="title" />
+					</div>
+				</div>
+				<div class="list-block" formArrayName="list">
+					<p class="list-title">Liste</p>
+					@for (item of homePanelList().controls; track $index) {
+						<div class="field-row">
+							<input [formControlName]="$index" type="text" />
+							<button type="button" class="button ghost danger" (click)="removeStringItem(homePanelList(), $index)">Supprimer</button>
+						</div>
+					}
+					<button type="button" class="button ghost" (click)="addStringItem(homePanelList())">Ajouter un item</button>
+				</div>
+				<div class="list-block" formArrayName="micro">
+					<p class="list-title">Micro stats</p>
+					@for (item of homePanelMicro().controls; track $index) {
+						<div class="field-row" [formGroupName]="$index">
+							<input type="text" formControlName="value" placeholder="Valeur" />
+							<input type="text" formControlName="label" placeholder="Label" />
+							<button type="button" class="button ghost danger" (click)="removeArrayItem(homePanelMicro(), $index)">Supprimer</button>
+						</div>
+					}
+					<button type="button" class="button ghost" (click)="addHomePanelMicro()">Ajouter</button>
+				</div>
+			</div>
+
+			<div class="subsection" formGroupName="proof">
+				<h3>Proof cards</h3>
+				<div class="list-block" formArrayName="cards">
+					@for (card of homeProofCards().controls; track $index) {
+						<div class="card-grid" [formGroupName]="$index">
+							<input type="text" formControlName="pill" placeholder="Pill" />
+							<input type="text" formControlName="title" placeholder="Titre" />
+							<textarea rows="2" formControlName="text" placeholder="Texte"></textarea>
+							<button type="button" class="button ghost danger" (click)="removeArrayItem(homeProofCards(), $index)">Supprimer</button>
+						</div>
+					}
+					<button type="button" class="button ghost" (click)="addHomeProofCard()">Ajouter une carte</button>
+				</div>
+			</div>
+
+			<div class="subsection" formGroupName="services">
+				<h3>Services</h3>
+				<div class="field-row">
+					<div class="field">
+						<label>Eyebrow</label>
+						<input type="text" formControlName="eyebrow" />
+					</div>
+					<div class="field">
+						<label>Titre</label>
+						<input type="text" formControlName="title" />
+					</div>
+				</div>
+				<div class="field">
+					<label>Lead</label>
+					<textarea rows="2" formControlName="lead"></textarea>
+				</div>
+				<div class="list-block" formArrayName="cards">
+					@for (card of homeServiceCards().controls; track $index; let cardIndex = $index) {
+						<div class="service-card" [formGroupName]="cardIndex">
+							<div class="field-row">
+								<input type="text" formControlName="title" placeholder="Titre" />
+								<button type="button" class="button ghost danger" (click)="removeArrayItem(homeServiceCards(), cardIndex)">Supprimer</button>
+							</div>
+							<textarea rows="2" formControlName="text" placeholder="Texte"></textarea>
+							<div class="list-block" formArrayName="items">
+								@for (item of homeServiceCardItems(cardIndex).controls; track $index) {
+									<div class="field-row">
+										<input [formControlName]="$index" type="text" />
+										<button type="button" class="button ghost danger" (click)="removeHomeServiceItem(cardIndex, $index)">Supprimer</button>
+									</div>
+								}
+								<button type="button" class="button ghost" (click)="addHomeServiceItem(cardIndex)">Ajouter un item</button>
+							</div>
+						</div>
+					}
+					<button type="button" class="button ghost" (click)="addHomeServiceCard()">Ajouter un service</button>
+				</div>
+			</div>
+
+			<div class="subsection" formGroupName="process">
+				<h3>Process</h3>
+				<div class="field-row">
+					<div class="field">
+						<label>Eyebrow</label>
+						<input type="text" formControlName="eyebrow" />
+					</div>
+					<div class="field">
+						<label>Titre</label>
+						<input type="text" formControlName="title" />
+					</div>
+				</div>
+				<div class="list-block" formArrayName="steps">
+					@for (step of homeProcessSteps().controls; track $index) {
+						<div class="card-grid" [formGroupName]="$index">
+							<input type="text" formControlName="number" placeholder="01" />
+							<input type="text" formControlName="title" placeholder="Titre" />
+							<textarea rows="2" formControlName="text" placeholder="Texte"></textarea>
+							<button type="button" class="button ghost danger" (click)="removeArrayItem(homeProcessSteps(), $index)">Supprimer</button>
+						</div>
+					}
+					<button type="button" class="button ghost" (click)="addHomeProcessStep()">Ajouter une etape</button>
+				</div>
+			</div>
+
+			<div class="subsection" formGroupName="showcase">
+				<h3>Showcase</h3>
+				<div class="field-row">
+					<div class="field">
+						<label>Eyebrow</label>
+						<input type="text" formControlName="eyebrow" />
+					</div>
+					<div class="field">
+						<label>Titre</label>
+						<input type="text" formControlName="title" />
+					</div>
+				</div>
+				<div class="list-block" formArrayName="cards">
+					@for (card of homeShowcaseCards().controls; track $index) {
+						<div class="card-grid" [formGroupName]="$index">
+							<input type="text" formControlName="pill" placeholder="Pill" />
+							<input type="text" formControlName="title" placeholder="Titre" />
+							<textarea rows="2" formControlName="text" placeholder="Texte"></textarea>
+							<input type="text" formControlName="meta" placeholder="Meta" />
+							<button type="button" class="button ghost danger" (click)="removeArrayItem(homeShowcaseCards(), $index)">Supprimer</button>
+						</div>
+					}
+					<button type="button" class="button ghost" (click)="addHomeShowcaseCard()">Ajouter une carte</button>
+				</div>
+			</div>
+
+			<div class="subsection" formGroupName="testimonials">
+				<h3>Temoignages</h3>
+				<div class="field-row">
+					<div class="field">
+						<label>Eyebrow</label>
+						<input type="text" formControlName="eyebrow" />
+					</div>
+					<div class="field">
+						<label>Titre</label>
+						<input type="text" formControlName="title" />
+					</div>
+				</div>
+				<div class="list-block" formArrayName="items">
+					@for (item of homeTestimonials().controls; track $index) {
+						<div class="card-grid" [formGroupName]="$index">
+							<textarea rows="2" formControlName="text" placeholder="Texte"></textarea>
+							<input type="text" formControlName="author" placeholder="Auteur" />
+							<button type="button" class="button ghost danger" (click)="removeArrayItem(homeTestimonials(), $index)">Supprimer</button>
+						</div>
+					}
+					<button type="button" class="button ghost" (click)="addHomeTestimonial()">Ajouter un temoignage</button>
+				</div>
+			</div>
+
+			<div class="subsection" formGroupName="cta">
+				<h3>CTA</h3>
+				<div class="field-row">
+					<input type="text" formControlName="eyebrow" placeholder="Eyebrow" />
+					<input type="text" formControlName="title" placeholder="Titre" />
+				</div>
+				<textarea rows="2" formControlName="lead" placeholder="Lead"></textarea>
+				<input type="text" formControlName="button" placeholder="Bouton" />
+			</div>
+
+			<div class="subsection" formGroupName="media">
+				<h3>Libelles media</h3>
+				<div class="field-row">
+					<input type="text" formControlName="eyebrow" placeholder="Eyebrow" />
+					<input type="text" formControlName="title" placeholder="Titre" />
+				</div>
+				<textarea rows="2" formControlName="lead" placeholder="Lead"></textarea>
+				<div class="field-row">
+					<input type="text" formControlName="photos" placeholder="Photos" />
+					<input type="text" formControlName="videos" placeholder="Videos" />
+					<input type="text" formControlName="docs" placeholder="Docs" />
+					<input type="text" formControlName="audio" placeholder="Audio" />
+				</div>
+				<div class="field-row">
+					<input type="text" formControlName="emptyPhotos" placeholder="Empty photos" />
+					<input type="text" formControlName="emptyVideos" placeholder="Empty videos" />
+					<input type="text" formControlName="emptyDocs" placeholder="Empty docs" />
+					<input type="text" formControlName="emptyAudio" placeholder="Empty audio" />
+				</div>
+			</div>
+		</section>
+		<section class="admin-section" formGroupName="about">
+			<h2>A propos</h2>
+			<div class="subsection" formGroupName="hero">
+				<h3>Hero</h3>
+				<div class="field-row">
+					<input type="text" formControlName="eyebrow" placeholder="Eyebrow" />
+					<input type="text" formControlName="title" placeholder="Titre" />
+				</div>
+				<textarea rows="3" formControlName="lead" placeholder="Lead"></textarea>
+				<div class="field-row">
+					<input type="text" formControlName="imageUrl" placeholder="Image url" />
+					<input type="text" formControlName="imageAlt" placeholder="Image alt" />
+					<input type="file" accept="image/*" (change)="uploadImage($event, 'about.hero.imageUrl')" />
+				</div>
+				<input type="text" formControlName="cardTitle" placeholder="Titre carte" />
+				<div class="list-block" formArrayName="metrics">
+					<p class="list-title">Metrics</p>
+					@for (metric of aboutMetrics().controls; track $index) {
+						<div class="field-row" [formGroupName]="$index">
+							<input type="text" formControlName="value" placeholder="Valeur" />
+							<input type="text" formControlName="label" placeholder="Label" />
+							<button type="button" class="button ghost danger" (click)="removeArrayItem(aboutMetrics(), $index)">Supprimer</button>
+						</div>
+					}
+					<button type="button" class="button ghost" (click)="addAboutMetric()">Ajouter</button>
+				</div>
+				<div class="list-block" formArrayName="cardList">
+					<p class="list-title">Liste carte</p>
+					@for (item of aboutCardList().controls; track $index) {
+						<div class="field-row">
+							<input [formControlName]="$index" type="text" />
+							<button type="button" class="button ghost danger" (click)="removeStringItem(aboutCardList(), $index)">Supprimer</button>
+						</div>
+					}
+					<button type="button" class="button ghost" (click)="addStringItem(aboutCardList())">Ajouter</button>
+				</div>
+			</div>
+
+			<div class="subsection" formGroupName="values">
+				<h3>Valeurs</h3>
+				<div class="field-row">
+					<input type="text" formControlName="eyebrow" placeholder="Eyebrow" />
+					<input type="text" formControlName="title" placeholder="Titre" />
+				</div>
+				<div class="list-block" formArrayName="items">
+					@for (item of aboutValues().controls; track $index) {
+						<div class="card-grid" [formGroupName]="$index">
+							<input type="text" formControlName="title" placeholder="Titre" />
+							<textarea rows="2" formControlName="description" placeholder="Description"></textarea>
+							<button type="button" class="button ghost danger" (click)="removeArrayItem(aboutValues(), $index)">Supprimer</button>
+						</div>
+					}
+					<button type="button" class="button ghost" (click)="addAboutValue()">Ajouter</button>
+				</div>
+			</div>
+
+			<div class="subsection" formGroupName="timeline">
+				<h3>Timeline</h3>
+				<div class="field-row">
+					<input type="text" formControlName="eyebrow" placeholder="Eyebrow" />
+					<input type="text" formControlName="title" placeholder="Titre" />
+				</div>
+				<div class="list-block" formArrayName="items">
+					@for (item of aboutTimeline().controls; track $index) {
+						<div class="card-grid" [formGroupName]="$index">
+							<input type="text" formControlName="title" placeholder="Titre" />
+							<textarea rows="2" formControlName="detail" placeholder="Detail"></textarea>
+							<button type="button" class="button ghost danger" (click)="removeArrayItem(aboutTimeline(), $index)">Supprimer</button>
+						</div>
+					}
+					<button type="button" class="button ghost" (click)="addAboutTimeline()">Ajouter</button>
+				</div>
+			</div>
+
+			<div class="subsection" formGroupName="highlights">
+				<h3>Highlights</h3>
+				<input type="text" formControlName="title" placeholder="Titre" />
+				<div class="list-block" formArrayName="items">
+					@for (item of aboutHighlights().controls; track $index) {
+						<div class="card-grid" [formGroupName]="$index">
+							<input type="text" formControlName="title" placeholder="Titre" />
+							<textarea rows="2" formControlName="detail" placeholder="Detail"></textarea>
+							<button type="button" class="button ghost danger" (click)="removeArrayItem(aboutHighlights(), $index)">Supprimer</button>
+						</div>
+					}
+					<button type="button" class="button ghost" (click)="addAboutHighlight()">Ajouter</button>
+				</div>
+			</div>
+
+			<div class="subsection" formGroupName="partners">
+				<h3>Partenaires</h3>
+				<div class="field-row">
+					<input type="text" formControlName="eyebrow" placeholder="Eyebrow" />
+					<input type="text" formControlName="title" placeholder="Titre" />
+				</div>
+				<div class="list-block" formArrayName="items">
+					@for (item of aboutPartners().controls; track $index) {
+						<div class="field-row">
+							<input [formControlName]="$index" type="text" />
+							<button type="button" class="button ghost danger" (click)="removeStringItem(aboutPartners(), $index)">Supprimer</button>
+						</div>
+					}
+					<button type="button" class="button ghost" (click)="addAboutPartner()">Ajouter</button>
+				</div>
+				<div class="list-block" formArrayName="logos">
+					<p class="list-title">Logos</p>
+					@for (logo of aboutPartnerLogos().controls; track $index) {
+						<div class="card-grid" [formGroupName]="$index">
+							<input type="text" formControlName="name" placeholder="Nom" />
+							<input type="text" formControlName="url" placeholder="Url" />
+							<input type="file" accept="image/*" (change)="uploadImage($event, 'about.partners.logos.' + $index + '.url')" />
+							<button type="button" class="button ghost danger" (click)="removeArrayItem(aboutPartnerLogos(), $index)">Supprimer</button>
+						</div>
+					}
+					<button type="button" class="button ghost" (click)="addAboutPartnerLogo()">Ajouter un logo</button>
+				</div>
+			</div>
+
+			<div class="subsection" formGroupName="partnerMedia">
+				<h3>Partenaires media</h3>
+				<div class="field-row">
+					<input type="text" formControlName="eyebrow" placeholder="Eyebrow" />
+					<input type="text" formControlName="title" placeholder="Titre" />
+					<input type="text" formControlName="empty" placeholder="Empty" />
+				</div>
+			</div>
+
+			<div class="subsection" formGroupName="publications">
+				<h3>Publications PDF</h3>
+				<div class="field-row">
+					<input type="text" formControlName="eyebrow" placeholder="Eyebrow" />
+					<input type="text" formControlName="title" placeholder="Titre" />
+					<input type="text" formControlName="empty" placeholder="Empty" />
+				</div>
+			</div>
+
+			<div class="subsection" formGroupName="showreel">
+				<h3>Showreel</h3>
+				<div class="field-row">
+					<input type="text" formControlName="eyebrow" placeholder="Eyebrow" />
+					<input type="text" formControlName="title" placeholder="Titre" />
+					<input type="text" formControlName="empty" placeholder="Empty" />
+				</div>
+			</div>
+
+			<div class="subsection" formGroupName="pressKit">
+				<h3>Press kit</h3>
+				<div class="field-row">
+					<input type="text" formControlName="eyebrow" placeholder="Eyebrow" />
+					<input type="text" formControlName="title" placeholder="Titre" />
+				</div>
+				<div class="list-block" formArrayName="items">
+					@for (item of aboutPressKit().controls; track $index) {
+						<div class="card-grid" [formGroupName]="$index">
+							<input type="text" formControlName="title" placeholder="Titre" />
+							<textarea rows="2" formControlName="description" placeholder="Description"></textarea>
+							<button type="button" class="button ghost danger" (click)="removeArrayItem(aboutPressKit(), $index)">Supprimer</button>
+						</div>
+					}
+					<button type="button" class="button ghost" (click)="addAboutPressKit()">Ajouter</button>
+				</div>
+			</div>
+
+			<div class="subsection" formGroupName="cta">
+				<h3>CTA</h3>
+				<div class="field-row">
+					<input type="text" formControlName="eyebrow" placeholder="Eyebrow" />
+					<input type="text" formControlName="title" placeholder="Titre" />
+				</div>
+				<textarea rows="2" formControlName="lead" placeholder="Lead"></textarea>
+				<input type="text" formControlName="button" placeholder="Bouton" />
+			</div>
+		</section>
+		<section class="admin-section" formGroupName="projects">
+			<h2>Projects</h2>
+			<div class="subsection" formGroupName="hero">
+				<h3>Hero</h3>
+				<div class="field-row">
+					<input type="text" formControlName="eyebrow" placeholder="Eyebrow" />
+					<input type="text" formControlName="title" placeholder="Titre" />
+				</div>
+				<textarea rows="2" formControlName="lead" placeholder="Lead"></textarea>
+				<div class="field-row">
+					<input type="text" formControlName="imageUrl" placeholder="Image url" />
+					<input type="text" formControlName="imageAlt" placeholder="Image alt" />
+					<input type="file" accept="image/*" (change)="uploadImage($event, 'projects.hero.imageUrl')" />
+				</div>
+				<input type="text" formControlName="panelTitle" placeholder="Panel title" />
+				<div class="list-block" formArrayName="bullets">
+					@for (item of projectsBullets().controls; track $index) {
+						<div class="field-row">
+							<input [formControlName]="$index" type="text" />
+							<button type="button" class="button ghost danger" (click)="removeStringItem(projectsBullets(), $index)">Supprimer</button>
+						</div>
+					}
+					<button type="button" class="button ghost" (click)="addProjectsBullet()">Ajouter</button>
+				</div>
+			</div>
+			<div class="subsection" formGroupName="media">
+				<h3>Libelles media</h3>
+				<div class="field-row">
+					<input type="text" formControlName="eyebrow" placeholder="Eyebrow" />
+					<input type="text" formControlName="title" placeholder="Titre" />
+				</div>
+				<div class="field-row">
+					<input type="text" formControlName="emptyPhoto" placeholder="Empty photo" />
+					<input type="text" formControlName="emptyVideo" placeholder="Empty video" />
+					<input type="text" formControlName="emptyDoc" placeholder="Empty doc" />
+				</div>
+			</div>
+			<div class="subsection" formGroupName="cta">
+				<h3>CTA</h3>
+				<div class="field-row">
+					<input type="text" formControlName="eyebrow" placeholder="Eyebrow" />
+					<input type="text" formControlName="title" placeholder="Titre" />
+				</div>
+				<textarea rows="2" formControlName="lead" placeholder="Lead"></textarea>
+				<input type="text" formControlName="button" placeholder="Bouton" />
+			</div>
+		</section>
+
+		<section class="admin-section" formGroupName="blog">
+			<h2>Blog</h2>
+			<div class="subsection" formGroupName="hero">
+				<h3>Hero</h3>
+				<div class="field-row">
+					<input type="text" formControlName="eyebrow" placeholder="Eyebrow" />
+					<input type="text" formControlName="title" placeholder="Titre" />
+				</div>
+				<textarea rows="2" formControlName="lead" placeholder="Lead"></textarea>
+				<div class="field-row">
+					<input type="text" formControlName="imageUrl" placeholder="Image url" />
+					<input type="text" formControlName="imageAlt" placeholder="Image alt" />
+					<input type="file" accept="image/*" (change)="uploadImage($event, 'blog.hero.imageUrl')" />
+				</div>
+				<input type="text" formControlName="listTitle" placeholder="List title" />
+				<div class="list-block" formArrayName="list">
+					@for (item of blogHeroList().controls; track $index) {
+						<div class="field-row">
+							<input [formControlName]="$index" type="text" />
+							<button type="button" class="button ghost danger" (click)="removeStringItem(blogHeroList(), $index)">Supprimer</button>
+						</div>
+					}
+					<button type="button" class="button ghost" (click)="addBlogHeroItem()">Ajouter</button>
+				</div>
+			</div>
+			<div class="subsection" formGroupName="resources">
+				<h3>Resources</h3>
+				<div class="field-row">
+					<input type="text" formControlName="eyebrow" placeholder="Eyebrow" />
+					<input type="text" formControlName="title" placeholder="Titre" />
+				</div>
+				<div class="field-row">
+					<input type="text" formControlName="pdfTitle" placeholder="PDF title" />
+					<input type="text" formControlName="audioTitle" placeholder="Audio title" />
+				</div>
+				<div class="field-row">
+					<input type="text" formControlName="emptyPdf" placeholder="Empty pdf" />
+					<input type="text" formControlName="emptyAudio" placeholder="Empty audio" />
+				</div>
+				<input type="text" formControlName="hint" placeholder="Hint" />
+			</div>
+			<div class="subsection" formGroupName="cta">
+				<h3>CTA</h3>
+				<div class="field-row">
+					<input type="text" formControlName="eyebrow" placeholder="Eyebrow" />
+					<input type="text" formControlName="title" placeholder="Titre" />
+				</div>
+				<textarea rows="2" formControlName="lead" placeholder="Lead"></textarea>
+				<input type="text" formControlName="button" placeholder="Bouton" />
+			</div>
+		</section>
+
+		<section class="admin-section" formGroupName="contact">
+			<h2>Contact</h2>
+			<div class="subsection" formGroupName="hero">
+				<h3>Hero</h3>
+				<div class="field-row">
+					<input type="text" formControlName="eyebrow" placeholder="Eyebrow" />
+					<input type="text" formControlName="title" placeholder="Titre" />
+				</div>
+				<textarea rows="2" formControlName="lead" placeholder="Lead"></textarea>
+			</div>
+			<div class="subsection" formArrayName="cards">
+				<h3>Cartes</h3>
+				@for (card of contactCards().controls; track $index) {
+					<div class="card-grid" [formGroupName]="$index">
+						<input type="text" formControlName="title" placeholder="Titre" />
+						<input type="text" formControlName="line1" placeholder="Ligne 1" />
+						<input type="text" formControlName="line2" placeholder="Ligne 2" />
+						<button type="button" class="button ghost danger" (click)="removeArrayItem(contactCards(), $index)">Supprimer</button>
+					</div>
+				}
+				<button type="button" class="button ghost" (click)="addContactCard()">Ajouter une carte</button>
+			</div>
+
+			<div class="subsection" formGroupName="form">
+				<h3>Formulaire</h3>
+				<div class="field-row">
+					<input type="text" formControlName="fullName" placeholder="Nom complet" />
+					<input type="text" formControlName="email" placeholder="Email" />
+					<input type="text" formControlName="phone" placeholder="Telephone" />
+				</div>
+				<div class="field-row">
+					<input type="text" formControlName="profile" placeholder="Profil" />
+					<input type="text" formControlName="projectType" placeholder="Type" />
+				</div>
+				<div class="field-row">
+					<input type="text" formControlName="message" placeholder="Message" />
+					<input type="text" formControlName="consent" placeholder="Consentement" />
+				</div>
+				<div class="field-row">
+					<input type="text" formControlName="submit" placeholder="Bouton" />
+					<input type="text" formControlName="success" placeholder="Message succes" />
+				</div>
+			</div>
+
+			<div class="subsection" formGroupName="errors">
+				<h3>Erreurs</h3>
+				<div class="field-row">
+					<input type="text" formControlName="fullName" placeholder="Erreur nom" />
+					<input type="text" formControlName="email" placeholder="Erreur email" />
+				</div>
+				<div class="field-row">
+					<input type="text" formControlName="message" placeholder="Erreur message" />
+					<input type="text" formControlName="consent" placeholder="Erreur consent" />
+				</div>
+			</div>
+
+			<div class="subsection" formArrayName="profileOptions">
+				<h3>Options profil</h3>
+				@for (opt of contactProfileOptions().controls; track $index) {
+					<div class="field-row" [formGroupName]="$index">
+						<input type="text" formControlName="value" placeholder="Value" />
+						<input type="text" formControlName="label" placeholder="Label" />
+						<button type="button" class="button ghost danger" (click)="removeArrayItem(contactProfileOptions(), $index)">Supprimer</button>
+					</div>
+				}
+				<button type="button" class="button ghost" (click)="addContactProfileOption()">Ajouter</button>
+			</div>
+
+			<div class="subsection" formArrayName="projectOptions">
+				<h3>Options projet</h3>
+				@for (opt of contactProjectOptions().controls; track $index) {
+					<div class="field-row" [formGroupName]="$index">
+						<input type="text" formControlName="value" placeholder="Value" />
+						<input type="text" formControlName="label" placeholder="Label" />
+						<button type="button" class="button ghost danger" (click)="removeArrayItem(contactProjectOptions(), $index)">Supprimer</button>
+					</div>
+				}
+				<button type="button" class="button ghost" (click)="addContactProjectOption()">Ajouter</button>
+			</div>
+		</section>
+
+		<div class="button-group">
+			<button class="button primary" type="submit">Enregistrer</button>
+			@if (saveMessage()) {
+				<p class="status-text">{{ saveMessage() }}</p>
+			}
+		</div>
+	</form>
+</section>

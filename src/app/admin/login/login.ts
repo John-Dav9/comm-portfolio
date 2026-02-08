@@ -20,6 +20,7 @@ export class Login {
   readonly submitted = signal(false);
   readonly loading = signal(false);
   readonly errorMessage = signal<string | null>(null);
+  readonly showPassword = signal(false);
 
   readonly loginForm = this.formBuilder.group({
     email: ['', [Validators.required, Validators.email]],
@@ -47,10 +48,15 @@ export class Login {
       await this.authService.login(email, password);
       const redirect = this.route.snapshot.queryParamMap.get('redirect') ?? '/admin/dashboard';
       await this.router.navigateByUrl(redirect);
-    } catch {
-      this.errorMessage.set('Identifiants invalides. Merci de réessayer.');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Identifiants invalides. Merci de réessayer.';
+      this.errorMessage.set(message);
     } finally {
       this.loading.set(false);
     }
+  }
+
+  togglePasswordVisibility() {
+    this.showPassword.update((current) => !current);
   }
 }

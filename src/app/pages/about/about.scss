@@ -18,6 +18,19 @@
 	gap: 1rem;
 }
 
+.about-media {
+	padding: 1rem;
+	display: grid;
+	place-items: center;
+}
+
+.about-media img {
+	width: 100%;
+	aspect-ratio: 4 / 5;
+	object-fit: cover;
+	border-radius: var(--radius-md);
+}
+
 .about-card ul {
 	margin: 0;
 	padding-left: 1.1rem;
@@ -115,6 +128,38 @@
 .partner-media-card figcaption {
 	color: var(--muted);
 	font-size: 0.9rem;
+}
+
+.partner-logo-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+	gap: 1.2rem;
+	margin-top: 1.4rem;
+}
+
+.partner-logo-card {
+	margin: 0;
+	padding: 1rem;
+	border-radius: var(--radius-md);
+	border: 1px solid var(--border);
+	background: var(--surface);
+	display: grid;
+	gap: 0.5rem;
+	place-items: center;
+	text-align: center;
+}
+
+.partner-logo-card img {
+	width: 100%;
+	aspect-ratio: 3 / 2;
+	object-fit: contain;
+	border-radius: var(--radius-sm);
+	background: var(--surface-alt);
+}
+
+.partner-logo-card figcaption {
+	color: var(--muted);
+	font-size: 0.85rem;
 }
 
 .partner-pill {

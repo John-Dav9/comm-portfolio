@@ -20,8 +20,28 @@
 
 			<div class="field">
 				<label for="password">Mot de passe</label>
-				<input id="password" type="password" formControlName="password" autocomplete="current-password"
-					[attr.aria-describedby]="showError('password') ? 'password-error' : null" />
+				<div class="input-with-toggle">
+					<input
+						id="password"
+						[type]="showPassword() ? 'text' : 'password'"
+						formControlName="password"
+						autocomplete="current-password"
+						[attr.aria-describedby]="showError('password') ? 'password-error' : null"
+					/>
+					<button
+						type="button"
+						class="toggle-password"
+						(click)="togglePasswordVisibility()"
+						[attr.aria-pressed]="showPassword()"
+						[attr.aria-label]="showPassword() ? 'Masquer le mot de passe' : 'Afficher le mot de passe'"
+					>
+						@if (showPassword()) {
+							<span>Masquer</span>
+						} @else {
+							<span>Afficher</span>
+						}
+					</button>
+				</div>
 				@if (showError('password')) {
 					<p id="password-error" class="error">Mot de passe requis (8 caractères min.).</p>
 				}

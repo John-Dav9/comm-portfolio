@@ -14,6 +14,12 @@
 		</div>
 	</div>
 
+	@if (content().hero.imageUrl) {
+		<div class="hero-media card">
+			<img [src]="content().hero.imageUrl" [alt]="content().hero.imageAlt" />
+		</div>
+	}
+
 	<div class="hero-panel card">
 		<p class="pill">{{ content().panel.pill }}</p>
 		<h2>{{ content().panel.title }}</h2>

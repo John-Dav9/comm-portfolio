@@ -2,52 +2,113 @@
 	<header class="admin-header">
 		<div>
 			<p class="eyebrow">Gestion articles</p>
-			<h1>Articles & ressources</h1>
+			<h1>Articles & journal</h1>
 			<p class="lead">{{ publishedCount() }} articles publiés</p>
+		</div>
+		<div class="lang-toggle" role="group" aria-label="Langue du formulaire">
+			<button type="button" class="toggle-btn" [class.is-active]="activeLang() === 'fr'" (click)="setLang('fr')">FR</button>
+			<button type="button" class="toggle-btn" [class.is-active]="activeLang() === 'en'" (click)="setLang('en')">EN</button>
 		</div>
 	</header>
 
 	<div class="admin-grid">
 		<form class="admin-form" [formGroup]="articleForm" (ngSubmit)="addArticle()">
 			<h2>{{ editingId() ? 'Modifier l\'article' : 'Ajouter un article' }}</h2>
-			<div class="field">
-				<label for="title">Titre</label>
-				<input id="title" type="text" formControlName="title" />
-			</div>
-			<div class="field">
-				<label for="category">Catégorie</label>
-				<select id="category" formControlName="category">
-					@for (option of categoryOptions; track option.value) {
-						<option [value]="option.value">{{ option.label }}</option>
-					}
-				</select>
-			</div>
+
 			<div class="field-row">
-				<div class="field">
-					<label for="readTime">Temps de lecture</label>
-					<input id="readTime" type="text" formControlName="readTime" placeholder="5 min" />
-				</div>
 				<div class="field">
 					<label for="status">Statut</label>
 					<select id="status" formControlName="status">
-						@for (option of statusOptions; track option.value) {
-							<option [value]="option.value">{{ option.label }}</option>
-						}
+						<option value="draft">Brouillon</option>
+						<option value="published">Publié</option>
 					</select>
 				</div>
+				<div class="field">
+					<label for="sortIndex">Ordre d’affichage</label>
+					<input id="sortIndex" type="number" min="1" formControlName="sortIndex" />
+				</div>
 			</div>
-			<div class="field">
-				<label for="summary">Résumé</label>
-				<textarea id="summary" rows="4" formControlName="summary"></textarea>
-			</div>
+
+			@if (activeLang() === 'fr') {
+				<div class="lang-panel" formGroupName="fr">
+					<p class="lang-label">Version française</p>
+					<div class="field">
+						<label for="title-fr">Titre</label>
+						<input id="title-fr" type="text" formControlName="title" />
+					</div>
+					<div class="field-row">
+						<div class="field">
+							<label for="category-fr">Catégorie</label>
+							<input id="category-fr" type="text" formControlName="category" placeholder="Journalisme" />
+						</div>
+						<div class="field">
+							<label for="readTime-fr">Temps de lecture</label>
+							<input id="readTime-fr" type="text" formControlName="readTime" placeholder="5 min" />
+						</div>
+					</div>
+					<div class="field-row">
+						<div class="field">
+							<label for="author-fr">Auteur</label>
+							<input id="author-fr" type="text" formControlName="author" />
+						</div>
+						<div class="field">
+							<label for="date-fr">Date</label>
+							<input id="date-fr" type="text" formControlName="date" />
+						</div>
+					</div>
+					<div class="field">
+						<label for="summary-fr">Résumé</label>
+						<textarea id="summary-fr" rows="4" formControlName="summary"></textarea>
+					</div>
+					<div class="field">
+						<label for="tags-fr">Tags (séparés par des virgules)</label>
+						<input id="tags-fr" type="text" formControlName="tags" />
+					</div>
+				</div>
+			} @else {
+				<div class="lang-panel" formGroupName="en">
+					<p class="lang-label">English version</p>
+					<div class="field">
+						<label for="title-en">Title</label>
+						<input id="title-en" type="text" formControlName="title" />
+					</div>
+					<div class="field-row">
+						<div class="field">
+							<label for="category-en">Category</label>
+							<input id="category-en" type="text" formControlName="category" placeholder="Journalism" />
+						</div>
+						<div class="field">
+							<label for="readTime-en">Read time</label>
+							<input id="readTime-en" type="text" formControlName="readTime" placeholder="5 min" />
+						</div>
+					</div>
+					<div class="field-row">
+						<div class="field">
+							<label for="author-en">Author</label>
+							<input id="author-en" type="text" formControlName="author" />
+						</div>
+						<div class="field">
+							<label for="date-en">Date</label>
+							<input id="date-en" type="text" formControlName="date" />
+						</div>
+					</div>
+					<div class="field">
+						<label for="summary-en">Summary</label>
+						<textarea id="summary-en" rows="4" formControlName="summary"></textarea>
+					</div>
+					<div class="field">
+						<label for="tags-en">Tags (comma separated)</label>
+						<input id="tags-en" type="text" formControlName="tags" />
+					</div>
+				</div>
+			}
+
 			<div class="button-group">
 				<button class="button primary" type="submit">
 					{{ editingId() ? 'Enregistrer les modifications' : 'Ajouter' }}
 				</button>
 				@if (editingId()) {
-					<button class="button ghost" type="button" (click)="cancelEdit()">
-						Annuler
-					</button>
+					<button class="button ghost" type="button" (click)="cancelEdit()">Annuler</button>
 				}
 			</div>
 		</form>
@@ -58,24 +119,23 @@
 				@for (article of articles(); track article.id) {
 					<li [class.is-editing]="editingId() === article.id">
 						<div class="article-info">
-							<h3>{{ article.title }}</h3>
-							<p class="meta">{{ article.category }} · {{ article.readTime }}</p>
-							<p class="summary">{{ article.summary }}</p>
+							<h3>{{ article.content[activeLang()].title }}</h3>
+							<p class="meta">
+								{{ article.content[activeLang()].category }} · {{ article.content[activeLang()].readTime }}
+							</p>
+							<p class="summary">{{ article.content[activeLang()].summary }}</p>
 							<span class="status" [class.is-published]="article.status === 'published'">
 								{{ article.status === 'published' ? 'Publié' : 'Brouillon' }}
 							</span>
 						</div>
 						<div class="article-actions">
-							<button class="button ghost" type="button" (click)="togglePublish(article.id)">
+							<button class="button ghost" type="button" (click)="togglePublish(article)">
 								{{ article.status === 'published' ? 'Dépublier' : 'Publier' }}
-							</button>
-							<button class="button ghost" type="button" (click)="showPreview.set(article.id)">
-								Aperçu
 							</button>
 							<button class="button ghost" type="button" (click)="editArticle(article)">
 								Modifier
 							</button>
-							<button class="button ghost danger" type="button" (click)="removeArticle(article.id)">
+							<button class="button ghost danger" type="button" (click)="removeArticle(article)">
 								Supprimer
 							</button>
 						</div>
@@ -84,41 +144,4 @@
 			</ul>
 		</div>
 	</div>
-
-	<!-- Preview Modal -->
-	@if (showPreview()) {
-		<div
-			class="modal-overlay"
-			tabindex="0"
-			role="presentation"
-			(click)="showPreview.set(null)"
-			(keydown.escape)="showPreview.set(null)">
-			<div
-				class="modal-content"
-				role="dialog"
-				aria-modal="true"
-				aria-labelledby="article-preview-title"
-				aria-describedby="article-preview-body"
-				(click)="$event.stopPropagation()">
-				@if (getArticleToPreview(showPreview()!)) {
-					<div class="preview-header">
-						<h2 id="article-preview-title">
-							Aperçu: {{ getArticleToPreview(showPreview()!)?.title }}
-						</h2>
-						<button class="close-button" type="button" (click)="showPreview.set(null)">×</button>
-					</div>
-					<div id="article-preview-body" class="preview-body">
-						<p class="meta">{{ getArticleToPreview(showPreview()!)?.category }} · {{ getArticleToPreview(showPreview()!)?.readTime }}</p>
-						<p>{{ getArticleToPreview(showPreview()!)?.summary }}</p>
-						<div class="preview-status">
-							<strong>Statut:</strong>
-							<span class="status" [class.is-published]="getArticleToPreview(showPreview()!)?.status === 'published'">
-								{{ getArticleToPreview(showPreview()!)?.status === 'published' ? 'Publié' : 'Brouillon' }}
-							</span>
-						</div>
-					</div>
-				}
-			</div>
-		</div>
-	}
 </section>

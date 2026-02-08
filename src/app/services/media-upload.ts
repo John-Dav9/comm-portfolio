@@ -17,6 +17,7 @@ export interface MediaItem {
   title: string;
   description: string;
   url: string;
+  path?: string;
   uploadedAt: number;
   type: MediaType;
   category: MediaCategory;
