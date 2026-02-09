@@ -77,9 +77,41 @@ Deno.serve(async (request) => {
     });
 
     if (!response.ok) {
-      const error = await response.text();
-      return new Response(error, { status: 502, headers: corsHeaders });
+      const errorBody = await response.text();
+      console.error('Resend error:', response.status, errorBody);
+      return new Response(
+        JSON.stringify({ error: 'ResendError', status: response.status, details: errorBody }),
+        { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
+
+    const replySubject = `Merci pour votre message, ${payload.fullName}`;
+    const replyText = [
+      `Bonjour ${payload.fullName},`,
+      '',
+      'Merci pour votre message. Je reviens vers vous rapidement.',
+      '',
+      'Résumé de votre demande :',
+      `Profil : ${payload.profile}`,
+      `Type de projet : ${payload.projectType}`,
+      '',
+      '—',
+      'Carnelle Nguepi'
+    ].join('\n');
+
+    await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${RESEND_API_KEY}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        from: CONTACT_FROM,
+        to: payload.email,
+        subject: replySubject,
+        text: replyText
+      })
+    });
 
     return new Response(JSON.stringify({ ok: true }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

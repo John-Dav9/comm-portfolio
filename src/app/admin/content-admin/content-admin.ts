@@ -32,6 +32,13 @@ export class ContentAdmin {
   readonly activeLang = signal<Language>('fr');
   readonly saveMessage = signal<string | null>(null);
   readonly uploadMessage = signal<string | null>(null);
+  readonly themeOptions = [
+    { value: 'sable', label: 'Sable (dégradé doux)' },
+    { value: 'noir-pro', label: 'Noir Pro (uni)' },
+    { value: 'presse', label: 'Presse (uni clair)' },
+    { value: 'emeraude', label: 'Émeraude (uni)' },
+    { value: 'sunset', label: 'Sunset (dégradé chaud)' }
+  ];
 
   private readonly homePanelListArray = this.formBuilder.array<StringControl>([]);
   private readonly homePanelMicroArray = this.formBuilder.array<FormGroup<{
@@ -109,6 +116,7 @@ export class ContentAdmin {
   }>>([]);
 
   readonly contentForm = this.formBuilder.group({
+    theme: ['sable'],
     header: this.formBuilder.group({
       brandTitle: ['', [Validators.required, Validators.minLength(2)]],
       subtitle: ['', [Validators.required, Validators.minLength(3)]],
@@ -581,6 +589,7 @@ export class ContentAdmin {
   }
   private patchForm(content: SiteContent) {
     this.contentForm.patchValue({
+      theme: content.theme,
       header: {
         brandTitle: content.header.brandTitle,
         subtitle: content.header.subtitle,
@@ -783,6 +792,7 @@ export class ContentAdmin {
   private buildContentFromForm(): SiteContent {
     const raw = this.contentForm.getRawValue();
     return {
+      theme: raw.theme || 'sable',
       header: {
         brandTitle: raw.header.brandTitle,
         subtitle: raw.header.subtitle,

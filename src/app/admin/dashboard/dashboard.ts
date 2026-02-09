@@ -18,6 +18,7 @@ export class Dashboard {
 
   readonly quickActions = [
     { label: 'Éditer le contenu', link: '/admin/content' },
+    { label: 'Lire les messages', link: '/admin/messages' },
     { label: 'Ajouter un projet', link: '/admin/projects' },
     { label: 'Rédiger un article', link: '/admin/articles' },
     { label: 'Gérer les médias', link: '/admin/media' },

@@ -1,0 +1,17 @@
+# Supabase Configuration
+project_id = "cpiffrqkfisxbrxycxdj"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[auth]
+enabled = true
+site_url = "https://portfolio-perso-31ee2.web.app"
+additional_redirect_urls = ["http://localhost:4200"]
+
+[functions.send-contact]
+verify_jwt = false

@@ -72,6 +72,11 @@
 					[attr.aria-describedby]="showError('consent') ? 'consent-error' : null" />
 				{{ content().form.consent }}
 			</label>
+			<p class="helper">
+				<a routerLink="/privacy">Politique de confidentialité</a> ·
+				<a routerLink="/terms">Conditions d’utilisation</a> ·
+				<a routerLink="/cookies">Politique de cookies</a>
+			</p>
 			@if (showError('consent')) {
 				<p id="consent-error" class="error">{{ content().errors.consent }}</p>
 			}

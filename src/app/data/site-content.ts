@@ -231,6 +231,7 @@ export interface ContactContent {
 }
 
 export interface SiteContent {
+  theme: string;
   header: HeaderContent;
   footer: FooterContent;
   home: HomeContent;
@@ -247,6 +248,7 @@ export interface LocalizedSiteContent {
 
 export const DEFAULT_SITE_CONTENT: LocalizedSiteContent = {
   fr: {
+    theme: 'sable',
     header: {
       brandTitle: 'Carnelle Nguepi',
       subtitle: 'Communication · Journalisme · Présentation média',
@@ -633,6 +635,7 @@ export const DEFAULT_SITE_CONTENT: LocalizedSiteContent = {
     }
   },
   en: {
+    theme: 'sable',
     header: {
       brandTitle: 'Carnelle Nguepi',
       subtitle: 'Communication · Journalism · Media presentation',

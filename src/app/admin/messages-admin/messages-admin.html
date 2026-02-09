@@ -1,0 +1,80 @@
+<section class="admin-page">
+	<header class="admin-header">
+		<div>
+			<p class="eyebrow">Messages</p>
+			<h1>Demandes reçues</h1>
+			<p class="lead">Consultez les messages envoyés depuis le formulaire public.</p>
+		</div>
+		<button class="button ghost" type="button" (click)="clearSelection()">Réinitialiser la sélection</button>
+	</header>
+
+	<section class="messages-grid">
+		<div class="messages-list card">
+			<div class="list-header">
+				<p class="list-title">Derniers messages</p>
+				<button class="button ghost" type="button" (click)="messagesService.refresh()">Rafraîchir</button>
+			</div>
+
+			@if (loading()) {
+				<p class="status-text">Chargement…</p>
+			} @else if (error()) {
+				<p class="error">{{ error() }}</p>
+			} @else if (messages().length === 0) {
+				<p class="status-text">Aucun message pour le moment.</p>
+			} @else {
+				<ul class="messages-items">
+					@for (item of messages(); track item.id) {
+						<li>
+							<button
+								type="button"
+								class="message-item"
+								[class.is-active]="selectedId() === item.id"
+								(click)="selectMessage(item.id)">
+								<div>
+									<p class="message-name">{{ item.fullName }}</p>
+									<p class="message-meta">{{ item.email }}</p>
+								</div>
+								<p class="message-date">{{ item.createdAt | date: 'dd MMM yyyy, HH:mm' }}</p>
+							</button>
+						</li>
+					}
+				</ul>
+			}
+		</div>
+
+		<div class="message-detail card">
+			@if (selectedMessage(); as selected) {
+				<header class="detail-header">
+					<div>
+						<h2>{{ selected.fullName }}</h2>
+						<p class="message-meta">{{ selected.email }}</p>
+					</div>
+					<p class="message-date">{{ selected.createdAt | date: 'dd MMM yyyy, HH:mm' }}</p>
+				</header>
+				<div class="detail-grid">
+					<div>
+						<p class="detail-label">Téléphone</p>
+						<p>{{ selected.phone || '—' }}</p>
+					</div>
+					<div>
+						<p class="detail-label">Profil</p>
+						<p>{{ selected.profile }}</p>
+					</div>
+					<div>
+						<p class="detail-label">Type de projet</p>
+						<p>{{ selected.projectType }}</p>
+					</div>
+				</div>
+				<div class="detail-message">
+					<p class="detail-label">Message</p>
+					<p>{{ selected.message }}</p>
+				</div>
+				<div class="detail-actions">
+					<a class="button primary" [href]="'mailto:' + selected.email">Répondre par email</a>
+				</div>
+			} @else {
+				<p class="status-text">Sélectionnez un message pour afficher le détail.</p>
+			}
+		</div>
+	</section>
+</section>

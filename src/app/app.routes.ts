@@ -22,6 +22,18 @@ export const routes: Routes = [
 	{
 		path: 'contact',
 		loadComponent: () => import('./pages/contact/contact').then((m) => m.Contact)
+	},
+	{
+		path: 'privacy',
+		loadComponent: () => import('./pages/privacy/privacy').then((m) => m.Privacy)
+	},
+	{
+		path: 'terms',
+		loadComponent: () => import('./pages/terms/terms').then((m) => m.Terms)
+	},
+	{
+		path: 'cookies',
+		loadComponent: () => import('./pages/cookies/cookies').then((m) => m.Cookies)
 	}
 	,
 	{
@@ -54,6 +66,11 @@ export const routes: Routes = [
 			{
 				path: 'media',
 				loadComponent: () => import('./admin/media-admin/media-admin').then((m) => m.MediaAdmin),
+				canActivate: [adminGuard]
+			},
+			{
+				path: 'messages',
+				loadComponent: () => import('./admin/messages-admin/messages-admin').then((m) => m.MessagesAdmin),
 				canActivate: [adminGuard]
 			}
 		]

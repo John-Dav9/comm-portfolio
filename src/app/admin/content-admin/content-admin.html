@@ -19,6 +19,18 @@
 			<p class="status-text">{{ uploadMessage() }}</p>
 		}
 
+		<section class="admin-section">
+			<h2>Thème</h2>
+			<div class="field">
+				<label for="theme">Palette du site</label>
+				<select id="theme" formControlName="theme">
+					@for (option of themeOptions; track option.value) {
+						<option [value]="option.value">{{ option.label }}</option>
+					}
+				</select>
+			</div>
+		</section>
+
 		<section class="admin-section" formGroupName="header">
 			<h2>Header</h2>
 			<div class="field">

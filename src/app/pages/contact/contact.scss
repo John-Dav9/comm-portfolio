@@ -76,6 +76,18 @@ textarea:focus {
 	font-weight: 500;
 }
 
+.helper {
+	margin: 0.35rem 0 0;
+	color: var(--muted);
+	font-size: 0.85rem;
+}
+
+.helper a {
+	color: var(--accent-2);
+	text-decoration: underline;
+	text-underline-offset: 3px;
+}
+
 .error {
 	color: #b42318;
 	font-size: 0.85rem;

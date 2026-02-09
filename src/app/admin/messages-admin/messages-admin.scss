@@ -1,0 +1,144 @@
+.admin-page {
+	display: grid;
+	gap: 2rem;
+	padding: 1.5rem;
+	border-radius: 24px;
+	background: var(--admin-bg);
+}
+
+.admin-header {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+}
+
+.messages-grid {
+	display: grid;
+	grid-template-columns: minmax(260px, 1fr) minmax(320px, 2fr);
+	gap: 1.5rem;
+}
+
+.card {
+	background: var(--admin-card);
+	border-radius: 20px;
+	border: 1px solid var(--admin-border);
+	padding: 1.4rem;
+	box-shadow: var(--admin-shadow);
+}
+
+.list-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 1rem;
+	margin-bottom: 1rem;
+}
+
+.list-title {
+	margin: 0;
+	font-weight: 700;
+}
+
+.messages-items {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: 0.65rem;
+}
+
+.message-item {
+	width: 100%;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 1rem;
+	padding: 0.75rem 0.9rem;
+	border-radius: 14px;
+	border: 1px solid transparent;
+	background: rgba(15, 23, 42, 0.04);
+	text-align: left;
+	cursor: pointer;
+}
+
+.message-item:hover {
+	border-color: rgba(15, 23, 42, 0.12);
+}
+
+.message-item.is-active {
+	background: rgba(42, 157, 143, 0.14);
+	border-color: rgba(42, 157, 143, 0.4);
+}
+
+.message-name {
+	margin: 0;
+	font-weight: 700;
+}
+
+.message-meta {
+	margin: 0.2rem 0 0;
+	color: var(--muted);
+	font-size: 0.9rem;
+}
+
+.message-date {
+	margin: 0;
+	color: var(--muted);
+	font-size: 0.85rem;
+	white-space: nowrap;
+}
+
+.detail-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: flex-start;
+	gap: 1rem;
+	margin-bottom: 1.2rem;
+}
+
+.detail-header h2 {
+	margin: 0;
+}
+
+.detail-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+	gap: 1rem;
+	margin-bottom: 1.2rem;
+}
+
+.detail-label {
+	margin: 0 0 0.35rem;
+	font-size: 0.85rem;
+	color: var(--muted);
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.04em;
+}
+
+.detail-message p {
+	margin: 0;
+	white-space: pre-wrap;
+}
+
+.detail-actions {
+	margin-top: 1.5rem;
+}
+
+.status-text {
+	margin: 0;
+	color: var(--muted);
+}
+
+.error {
+	color: #b42318;
+	margin: 0;
+}
+
+@media (max-width: 900px) {
+	.messages-grid {
+		grid-template-columns: 1fr;
+	}
+}
